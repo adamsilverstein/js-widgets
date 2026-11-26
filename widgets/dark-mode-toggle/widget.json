@@ -1,0 +1,9 @@
+{
+	"name": "Dark Mode Toggle",
+	"description": "A sun and moon button that switches the page between light and dark, remembers the choice and reveals the new theme in a circle.",
+	"category": "utility",
+	"file": "theme",
+	"issue": 5,
+	"snippet": "<script src=\"theme.min.js\" data-position=\"top-right\"></script>",
+	"demoHeight": 272
+}

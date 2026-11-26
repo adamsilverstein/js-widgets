@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dark Mode Toggle demo</title>
+<script src="theme.min.js" data-position="top-right"></script>
+<style>
+	/* The site's own dark styles, keyed off the attribute the widget sets. */
+	:root { --bg: #fdfbf7; --text: #1d1d1f; --muted: #5b5b66; --card: #fff; --accent: #c2410c; }
+	[data-theme="dark"] { --bg: #14161c; --text: #ececf1; --muted: #a0a3ad; --card: #1f2330; --accent: #fb923c; }
+	body { margin: 0; padding: 20px 72px 20px 20px; font: 16px/1.5 system-ui, sans-serif; background: var(--bg); color: var(--text); }
+	h1 { margin: 0 0 4px; font-size: 1.4rem; }
+	p { margin: 0 0 12px; color: var(--muted); }
+	.card { padding: 14px 16px; border-radius: 10px; background: var(--card); box-shadow: 0 1px 4px rgb(0 0 0 / .12); }
+	.card strong { color: var(--accent); }
+	/* Form controls follow `color-scheme` with no extra CSS. */
+	label { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+</style>
+</head>
+<body>
+<h1>Trail notes</h1>
+<p>Press the button in the corner to switch themes. Your choice is remembered on reload and in other tabs.</p>
+<div class="card">
+	<strong>Ridge loop, 8 km.</strong> Steady climb through pines, then a long view over the valley.
+	<label>Rating <input type="range" min="1" max="5" value="4"></label>
+</div>
+</body>
+</html>
