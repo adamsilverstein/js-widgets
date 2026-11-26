@@ -31,10 +31,10 @@ ready( () => {
 	// Both parts repeat the scroll position, and screen readers do not read counter values.
 	host.ariaHidden = true;
 	const root = document.body.appendChild( host ).attachShadow( { mode: 'open' } );
-	root.innerHTML = `<style>*{position:fixed;z-index:2147483001}div{inset:0 0 auto;height:4px;background:${ color };transform-origin:0;transform:scaleX(0)}p{margin:16px;bottom:0;right:0;padding:4px 9px;border-radius:9px;background:#222d;color:#fff;font:13px sans-serif;counter-reset:m var(--jsw-min)}p::before{content:counter(m) " min left"}</style><div></div>${
-		showTime ? '<p></p>' : ''
+	root.innerHTML = `<style>*{position:fixed;z-index:2147483001;pointer-events:none}div{inset:0 0 auto;height:4px;background:${ color };transform-origin:0;transform:scaleX(0)}b{bottom:16px;right:16px;padding:4px 9px;border-radius:9px;background:#222d;color:#fff;font:13px sans-serif;counter-reset:m var(--jsw-min)}b::before{content:counter(m) " min left"}</style><div></div>${
+		showTime ? '<b></b>' : ''
 	}`;
-	const [ bar, pill ] = root.querySelectorAll( 'div,p' );
+	const [ bar, pill ] = root.querySelectorAll( 'div,b' );
 
 	// A view timeline on the article keeps comments and footers out of the progress.
 	const timeline = self.ViewTimeline && new ViewTimeline( { subject: article } );

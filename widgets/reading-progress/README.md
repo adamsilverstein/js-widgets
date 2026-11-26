@@ -20,7 +20,7 @@ A thin bar across the top of the page fills as the reader moves through an artic
 - Progress follows the target element only. The bar is empty until the top of the article reaches the top of the window, and full once its end is in view, so comments and footers do not count.
 - The bar runs on a CSS scroll-driven animation (a `ViewTimeline` on the target), so no JavaScript runs while the page scrolls. Browsers without scroll-driven animations get the same bar and pill, updated by a passive scroll listener.
 - The time left is the target's word count divided by `data-wpm`, counting down in whole minutes. It is left out for articles under two minutes, and fades out near the end.
-- Both the bar and the pill are hidden from assistive technology, since they repeat the scroll position.
+- Both the bar and the pill are hidden from assistive technology, since they repeat the scroll position. They ignore the pointer, so links and buttons under them stay clickable.
 - The pill sits in the bottom right corner of the window. It does not share the corner stack other floating widgets use, which keeps the widget under 1.5 KB.
 - Nothing moves except in step with the reader's own scrolling, so there is no separate reduced motion mode.
 - No network requests, no permissions.

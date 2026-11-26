@@ -33,7 +33,7 @@ const progress = ( page ) =>
 
 /** The minutes the pill shows. */
 const minutesLeft = ( page ) =>
-	page.locator( `${ HOST } p` ).evaluate( ( pill ) => Number( getComputedStyle( pill ).getPropertyValue( '--jsw-min' ) ) );
+	page.locator( `${ HOST } b` ).evaluate( ( pill ) => Number( getComputedStyle( pill ).getPropertyValue( '--jsw-min' ) ) );
 
 async function assertTracksArticle( page ) {
 	await scrollTo( page, 'top' );
@@ -75,7 +75,7 @@ test( 'falls back to a scroll listener without scroll-driven animations', async 
 
 test( 'hides the bar and pill from assistive technology', async () => {
 	const { page, close } = await openDemo( 'reading-progress' );
-	assert.equal( await page.locator( `${ HOST } p` ).count(), 1, 'shows the pill' );
+	assert.equal( await page.locator( `${ HOST } b` ).count(), 1, 'shows the pill' );
 	const session = await page.context().newCDPSession( page );
 	const { nodes } = await session.send( 'Accessibility.getFullAXTree' );
 	const exposed = nodes.filter( ( node ) => ! node.ignored && node.name?.value?.includes( 'min left' ) );
@@ -91,6 +91,20 @@ test( 'leaves the time left out for a short article', async () => {
 		)
 	);
 	assert.equal( await page.locator( `${ HOST } div` ).count(), 1, 'still shows the bar' );
-	assert.equal( await page.locator( `${ HOST } p` ).count(), 0 );
+	assert.equal( await page.locator( `${ HOST } b` ).count(), 0 );
+	await close();
+} );
+
+test( 'lets clicks through to the page under the bar and pill', async () => {
+	const { page, close } = await openDemo( 'reading-progress' );
+	await scrollTo( page, 'bottom' );
+	const hits = await page.evaluate( ( selector ) => {
+		const host = document.querySelector( selector );
+		return [ ...host.shadowRoot.querySelectorAll( 'div,b' ) ].map( ( element ) => {
+			const { x, y, width, height } = element.getBoundingClientRect();
+			return document.elementFromPoint( x + width / 2, y + height / 2 ) === host;
+		} );
+	}, HOST );
+	assert.deepEqual( hits, [ false, false ] );
 	await close();
 } );
