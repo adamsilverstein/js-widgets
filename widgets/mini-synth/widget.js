@@ -64,7 +64,6 @@ root.innerHTML += `<div class="bar">
 const keyboard = root.querySelector( '.keys' );
 const midiButton = root.querySelector( '.midi' );
 const buttons = new Map();
-const pressed = new Map();
 
 // Four grid columns per white key, so a black key can straddle two white keys.
 let whites = 0;
@@ -89,6 +88,10 @@ let ctx, master;
 /** Sounding notes, keyed by what holds them: a pointer, a computer key or a MIDI note. */
 const voices = new Map();
 
+/** Lights a key while any source holds its note. */
+const light = ( note ) =>
+	buttons.get( note )?.classList.toggle( 'on', [ ...voices.values() ].some( ( voice ) => voice.note === note ) );
+
 /**
  * Starts a note for `source`, replacing any note that source already holds.
  * The audio context is created here, so nothing exists before the first press.
@@ -112,7 +115,7 @@ function noteOn( source, note ) {
 	osc.connect( gain ).connect( master );
 	osc.start( t );
 	voices.set( source, { note, osc, gain } );
-	press( note, 1 );
+	light( note );
 }
 
 /**
@@ -130,14 +133,7 @@ function noteOff( source ) {
 	voice.gain.gain.cancelScheduledValues( t );
 	voice.gain.gain.setTargetAtTime( 0, t, 0.04 );
 	voice.osc.stop( t + 0.3 );
-	press( voice.note, -1 );
-}
-
-/** Lights a key while at least one source holds its note. */
-function press( note, delta ) {
-	const count = ( pressed.get( note ) || 0 ) + delta;
-	pressed.set( note, count );
-	buttons.get( note )?.classList.toggle( 'on', count > 0 );
+	light( voice.note );
 }
 
 const stopAll = ( prefix = '' ) => {
