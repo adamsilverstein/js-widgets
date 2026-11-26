@@ -1,0 +1,9 @@
+{
+	"name": "Listen to This Page",
+	"description": "Reads an article aloud with the browser's own voices and highlights each sentence as it is spoken.",
+	"category": "reading",
+	"file": "listen",
+	"issue": 7,
+	"snippet": "<script src=\"listen.min.js\" data-target=\"article\" data-rate=\"1\"></script>",
+	"demoHeight": 360
+}
