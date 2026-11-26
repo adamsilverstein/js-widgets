@@ -57,7 +57,8 @@ ready( () => {
 			const { top, height } = article.getBoundingClientRect();
 			for ( const animation of animations ) {
 				animation.pause();
-				animation.currentTime = Math.min( 1, Math.max( 0, -top / Math.max( 1, height - innerHeight ) ) );
+				// The 'both' fill holds the first or last frame outside 0 to 1.
+				animation.currentTime = -top / Math.max( 1, height - innerHeight );
 			}
 		};
 		addEventListener( 'scroll', update, { passive: true } );
