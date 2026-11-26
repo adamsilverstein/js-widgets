@@ -1,0 +1,10 @@
+{
+	"name": "Speed Badge",
+	"description": "A tiny badge showing how fast the page loaded, which opens to live LCP, CLS and INP for the current visit.",
+	"category": "utility",
+	"file": "speed",
+	"issue": 13,
+	"snippet": "<script src=\"speed.min.js\" data-metric=\"lcp\"></script>",
+	"maxBytes": 2048,
+	"demoHeight": 300
+}

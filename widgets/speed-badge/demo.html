@@ -1,0 +1,23 @@
+<h1>Speed Badge</h1>
+<p>The badge in the footer shows this page's Largest Contentful Paint. Open it for CLS and INP, then try the buttons to move the numbers.</p>
+<p>
+	<button type="button" id="slow">Slow click (300ms)</button>
+	<button type="button" id="shift">Late layout shift</button>
+</p>
+<p id="shifted" hidden>This line arrived late and pushed the footer down.</p>
+
+<footer style="margin-top:24px;border-top:1px solid;padding-top:8px">
+	<script src="speed.min.js" data-metric="lcp"></script>
+</footer>
+
+<script>
+	// Block the main thread so the click registers as a slow interaction.
+	document.getElementById( 'slow' ).addEventListener( 'click', () => {
+		const end = performance.now() + 300;
+		while ( performance.now() < end ) {}
+	} );
+	// Shifts within 500ms of input do not count, so wait before inserting.
+	document.getElementById( 'shift' ).addEventListener( 'click', () => {
+		setTimeout( () => ( document.getElementById( 'shifted' ).hidden = false ), 800 );
+	} );
+</script>
