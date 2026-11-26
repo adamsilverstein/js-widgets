@@ -1,0 +1,9 @@
+{
+	"name": "Mini Synth",
+	"description": "A two octave keyboard visitors can play with a mouse, touch, their computer keyboard or a MIDI controller.",
+	"category": "fun",
+	"file": "synth",
+	"issue": 16,
+	"snippet": "<script src=\"synth.min.js\" data-octaves=\"2\" data-wave=\"sine\"></script>",
+	"demoHeight": 380
+}
