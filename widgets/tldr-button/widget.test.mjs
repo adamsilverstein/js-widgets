@@ -6,11 +6,13 @@ import { openDemo } from '../../test/harness.mjs';
  * Installs a fake `Summarizer` global, since headless Chromium has no built-in AI.
  * Calls are recorded on `window.calls`. Each streamed chunk waits for
  * `window.step()` when `gated` is set, and `create()` hangs after reporting
- * half a download when `download` is set, until its signal aborts.
+ * half a download when `download` is set, until its signal aborts. Otherwise
+ * `create()` reports progress 0 and 1, as Chrome does when the model is
+ * already on the device, and records the widget's text on `window.calls.shown`.
  */
 function mockSummarizer( page, settings = {} ) {
 	return page.addInitScript( ( { state = 'available', chunks = [], quota = Infinity, gated = false, download = false } ) => {
-		const calls = ( window.calls = { availability: [], create: [], input: [], aborted: 0 } );
+		const calls = ( window.calls = { availability: [], create: [], input: [], aborted: 0, shown: [] } );
 		let permits = 0;
 		let wake = () => {};
 		window.step = () => {
@@ -34,6 +36,12 @@ function mockSummarizer( page, settings = {} ) {
 							reject( new DOMException( 'Aborted', 'AbortError' ) );
 						} )
 					);
+				}
+				const monitor = new EventTarget();
+				options.monitor( monitor );
+				for ( const loaded of [ 0, 1 ] ) {
+					monitor.dispatchEvent( Object.assign( new Event( 'downloadprogress' ), { loaded } ) );
+					calls.shown.push( document.querySelector( 'article > div' ).shadowRoot.textContent );
 				}
 				return Promise.resolve( {
 					inputQuota: quota,
@@ -129,6 +137,17 @@ test( 'streams a labelled summary on click and announces it when done', async ()
 	const origin = new URL( page.url() ).origin;
 	assert.ok( requests.every( ( url ) => url.startsWith( origin ) ), 'no requests leave the page origin' );
 	assert.deepEqual( errors, [] );
+	await close();
+} );
+
+test( 'shows no download progress when the model is already available', async () => {
+	const { page, close } = await openDemo( 'tldr-button', {}, ( p ) => mockSummarizer( p, { chunks: CHUNKS, gated: true } ) );
+	await page.getByRole( 'button', { name: 'TL;DR' } ).click();
+	await page.getByText( 'Summarizing…' ).waitFor();
+	assert.equal( await page.locator( 'progress' ).isVisible(), false );
+	const shown = await page.evaluate( () => window.calls.shown );
+	assert.equal( shown.length, 2 );
+	assert.ok( shown.every( ( text ) => ! text.includes( 'Downloading' ) ), 'no download message flashes' );
 	await close();
 } );
 

@@ -31,7 +31,8 @@ ready( async () => {
 		outputLanguage: lang,
 		sharedContext: 'An article on a web page.',
 	};
-	if ( ( await availability( 'Summarizer', config ) ) === 'unavailable' ) {
+	let state = await availability( 'Summarizer', config );
+	if ( state === 'unavailable' ) {
 		return;
 	}
 
@@ -103,11 +104,17 @@ ready( async () => {
 		let summarizer;
 		try {
 			// create() must run in the click's task: a model download needs user activation.
+			// create() reports progress 0 and 1 even when the model is already on the
+			// device, so only show it when a download is expected.
 			summarizer = await create( 'Summarizer', { ...config, signal }, ( loaded ) => {
-				showWait( 'Downloading the summary model…' );
-				progress.hidden = false;
-				progress.value = loaded;
+				if ( state !== 'available' ) {
+					showWait( 'Downloading the summary model…' );
+					progress.hidden = false;
+					progress.value = loaded;
+				}
 			} );
+			state = 'available';
+			progress.hidden = true;
 			showWait( 'Summarizing…' );
 			// innerText skips the widget's own shadow root, so the button text is not summarized.
 			const { text, cut } = await fit( summarizer, article.innerText.trim() );
