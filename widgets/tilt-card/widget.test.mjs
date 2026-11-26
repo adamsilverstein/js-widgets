@@ -91,5 +91,17 @@ test( 'follows device orientation on touch screens', async () => {
 	for ( const selector of [ '.profile', '.badge' ] ) {
 		assert.match( await transformOf( page.locator( selector ) ), /rotateY\((?!-)[\d.]+deg\)/ );
 	}
+	// Sensor noise on a phone lying still must not keep the animation running.
+	await page.evaluate( () => {
+		let i = 0;
+		setInterval( () => dispatchEvent( new DeviceOrientationEvent( 'deviceorientation', { beta: 40 + ( i++ % 2 ) * 0.2, gamma: 0 } ) ), 16 );
+	} );
+	await page.waitForTimeout( 1000 );
+	const frames = await page.evaluate( async () => {
+		const first = getComputedStyle( document.querySelector( '.profile' ) ).transform;
+		await new Promise( ( resolve ) => setTimeout( resolve, 300 ) );
+		return [ first, getComputedStyle( document.querySelector( '.profile' ) ).transform ];
+	} );
+	assert.equal( frames[ 0 ], frames[ 1 ] );
 	await close();
 } );

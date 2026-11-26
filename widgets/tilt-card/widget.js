@@ -124,8 +124,9 @@ function followOrientation() {
 		rest ??= { beta, gamma };
 		rest.beta += ( beta - rest.beta ) * 0.02;
 		rest.gamma += ( gamma - rest.gamma ) * 0.02;
-		const x = Math.max( -1, Math.min( 1, ( gamma - rest.gamma ) / 20 ) );
-		const y = Math.max( -1, Math.min( 1, ( beta - rest.beta ) / 20 ) );
+		// Whole degrees, so sensor noise on a still phone lets the animation settle.
+		const x = Math.max( -1, Math.min( 1, Math.round( gamma - rest.gamma ) / 20 ) );
+		const y = Math.max( -1, Math.min( 1, Math.round( beta - rest.beta ) / 20 ) );
 		cards.forEach( ( tiltTo ) => tiltTo( x, y, true ) );
 	} );
 }
