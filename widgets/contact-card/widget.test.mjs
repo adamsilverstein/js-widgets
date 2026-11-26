@@ -180,3 +180,18 @@ test( 'fits a small phone screen without covering the button', async () => {
 	assert.ok( card.y + card.height <= button.y, 'card sits above the button' );
 	await close();
 } );
+
+test( 'keeps a bad accent color from breaking out of the styles', async () => {
+	const { page, errors, close } = await open( {
+		edit: ( html ) =>
+			html.replace( 'data-phone', 'data-color="red}&lt;/style&gt;&lt;img src=x onerror=window.injected=1&gt;" data-phone' ),
+	} );
+	const toggle = page.getByRole( 'button', { name: 'Contact us' } );
+	await toggle.click();
+
+	assert.equal( await page.evaluate( () => window.injected ), undefined );
+	assert.equal( await shadow( page, ( root ) => root.querySelectorAll( 'img' ).length ), 0 );
+	assert.equal( await page.getByRole( 'dialog' ).isVisible(), true );
+	assert.deepEqual( errors, [] );
+	await close();
+} );

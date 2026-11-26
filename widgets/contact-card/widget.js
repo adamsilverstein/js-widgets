@@ -19,7 +19,7 @@ const { phone, email, endpoint, label, color, position } = options( {
 } );
 
 const CSS = `
-:host { color-scheme: light dark; --accent: ${ color }; font: 15px/1.4 system-ui, sans-serif }
+:host { color-scheme: light dark; font: 15px/1.4 system-ui, sans-serif }
 button, input, textarea { font: inherit }
 .toggle { width: 56px; height: 56px; border: 0; border-radius: 50%; background: var(--accent); color: #fff; cursor: pointer; display: grid; place-items: center; box-shadow: 0 4px 14px #0004 }
 .toggle svg { width: 26px; height: 26px }
@@ -87,6 +87,8 @@ if ( ( phone || email || endpoint ) && Object.hasOwn( HTMLElement.prototype, 'po
 		const card = root.querySelector( '.card' );
 		const actions = root.querySelector( '.actions' );
 
+		// Set as a property, not in the CSS text, so the value cannot break out of the <style>.
+		root.host.style.setProperty( '--accent', color );
 		toggle.setAttribute( 'aria-label', label );
 		root.querySelector( 'h2' ).textContent = label;
 		toggle.popoverTargetElement = close.popoverTargetElement = card;
