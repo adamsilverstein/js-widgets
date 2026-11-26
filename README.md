@@ -51,3 +51,7 @@ npm test                          # build, check size budgets, load every demo i
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a widget and the conventions every widget follows.
+
+## License
+
+[MIT](LICENSE). Copy the widgets into any site, personal or commercial.
