@@ -94,6 +94,34 @@ test( 'never asks for a location until the button is clicked', async () => {
 	await close();
 } );
 
+test( 'keeps focus on the button when the location is refused', async () => {
+	const { page, close } = await openDemo( 'local-weather', {}, ( p ) =>
+		p.addInitScript( () => {
+			navigator.geolocation.getCurrentPosition = ( success, failure ) => setTimeout( failure, 10 );
+		} )
+	);
+	const button = page.getByRole( 'button', { name: 'Use my location' } );
+	await button.focus();
+	await page.keyboard.press( 'Enter' );
+	await page.getByText( 'Your location is not available.' ).waitFor();
+	assert.ok( await button.evaluate( ( el ) => el.getRootNode().activeElement === el ) );
+	await close();
+} );
+
+test( 'announces only what follows a click', async () => {
+	const { setup } = stubApi();
+	const { page, close } = await openDemo( 'local-weather', {}, setup );
+	await fixedCard( page ).getByText( '72°' ).waitFor();
+	const live = () =>
+		page.evaluate( () =>
+			[ ...document.querySelectorAll( 'div' ) ].map( ( host ) => !! host.shadowRoot?.querySelector( '[aria-live]' ) )
+		);
+	assert.deepEqual( await live(), [ false, false ] );
+	await page.getByRole( 'button', { name: 'Use my location' } ).click();
+	assert.deepEqual( await live(), [ false, true ] );
+	await close();
+} );
+
 test( 'fails quietly when the request fails', async () => {
 	const { setup } = stubApi( { status: 500 } );
 	const { page, errors, close } = await openDemo( 'local-weather', {}, setup );

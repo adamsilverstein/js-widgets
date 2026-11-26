@@ -148,10 +148,10 @@ a { display: block; margin-top: 10px; color: inherit; }
 const card = document.createElement( 'section' );
 card.className = 'card';
 card.setAttribute( 'aria-label', config.label ? `Weather in ${ config.label }` : 'Weather' );
-card.innerHTML = `${ config.label ? '<h2></h2>' : '' }<div aria-live="polite"></div>
+card.innerHTML = `${ config.label ? '<h2></h2>' : '' }<div></div>
 <a href="https://open-meteo.com/" target="_blank" rel="noopener">Weather data by Open-Meteo</a>`;
 card.querySelector( 'h2' )?.append( config.label );
-const body = card.querySelector( '[aria-live]' );
+const body = card.querySelector( 'div' );
 root.append( card );
 
 /** Shows a short status line, with an optional button below it. */
@@ -218,7 +218,14 @@ async function start() {
 	const button = document.createElement( 'button' );
 	button.type = 'button';
 	button.textContent = 'Use my location';
+	// Replacing the status removes the focused button, so a retry puts focus back on it.
+	const retry = ( text ) => {
+		status( text, button );
+		button.focus();
+	};
 	button.addEventListener( 'click', () => {
+		// Announce only the results of the click, not the forecast or messages shown on load.
+		body.setAttribute( 'aria-live', 'polite' );
 		if ( ! navigator.geolocation ) {
 			return status( 'Your location is not available.' );
 		}
@@ -228,10 +235,10 @@ async function start() {
 				// Two decimals, about 1 km, is plenty for weather and shares less with the API.
 				const here = [ coords.latitude, coords.longitude ].map( ( n ) => Math.round( n * 100 ) / 100 );
 				if ( ! ( await show( here, cacheKey() ) ) ) {
-					status( 'Weather is unavailable right now.', button );
+					retry( 'Weather is unavailable right now.' );
 				}
 			},
-			() => status( 'Your location is not available.', button ),
+			() => retry( 'Your location is not available.' ),
 			{ maximumAge: 30 * 60e3, timeout: 10000 }
 		);
 	} );
