@@ -6,6 +6,8 @@ A compact card with the current temperature, condition and a three day forecast.
 <script src="weather.min.js" data-lat="44.05" data-lon="-121.31" data-units="f" data-label="Bend, OR"></script>
 ```
 
+Paste the snippet inside `<body>`, where the card should appear. In `<head>` the card has nowhere visible to render.
+
 Leave out `data-lat` and `data-lon` and the card shows a **Use my location** button instead. The browser asks for the visitor's location only after they click it, never on page load.
 
 ## Options

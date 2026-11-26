@@ -5,5 +5,5 @@
 	"file": "weather",
 	"issue": 2,
 	"snippet": "<script src=\"weather.min.js\" data-lat=\"44.05\" data-lon=\"-121.31\" data-units=\"f\" data-label=\"Bend, OR\"></script>",
-	"demoHeight": 520
+	"demoHeight": 600
 }
