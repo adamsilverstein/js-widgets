@@ -2,7 +2,9 @@
  * Design prototypes for the gallery and the README. Not part of the build.
  *
  *   npm run build && node design/shoot.mjs thumbs && node design/build-concepts.mjs
- *   node scripts/serve.mjs   (or any static server on site/)
+ *   python3 -m http.server -d site 8080
+ *
+ * Run it with the widget directories from the widget PRs checked out, so there is something to show.
  *
  * Writes, from the real widgets in site/widgets.json:
  *   site/concept-workbench.html   Concept A: one widget on a stage, options you can edit.
