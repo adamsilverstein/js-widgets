@@ -82,6 +82,23 @@ test( 'naps when the page has been still', async () => {
 	await close();
 } );
 
+test( 'naps beside a pointer that stops moving, and stops animating while asleep', async () => {
+	const { page, close } = await openDemo( 'pet-companion', { viewport: { width: 600, height: 300 } }, ( p ) => p.clock.install() );
+	await page.clock.runFor( 100 );
+	const { x } = await read( page );
+	await page.mouse.move( x + 60, 290 );
+	await page.clock.runFor( 21000 );
+	assert.match( ( await read( page ) ).state, /sleep/ );
+	await page.evaluate( () => {
+		const request = requestAnimationFrame;
+		window.frameCount = 0;
+		window.requestAnimationFrame = ( fn ) => request( fn, window.frameCount++ );
+	} );
+	await page.clock.runFor( 1000 );
+	assert.equal( await page.evaluate( () => window.frameCount ), 0 );
+	await close();
+} );
+
 test( 'sits still with reduced motion', async () => {
 	const { page, close } = await openDemo( 'pet-companion', { reducedMotion: 'reduce' } );
 	const before = await read( page );

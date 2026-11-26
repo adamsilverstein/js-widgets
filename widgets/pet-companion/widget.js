@@ -156,14 +156,15 @@ ready( () => {
 			// Hold still so a keyboard user can see what the button hides.
 			speed = 0;
 			pose( 'sit' );
+		} else if ( now - lastActive > SLEEP_AFTER ) {
+			// Checked before `near`, so a pointer resting by the pet does not keep it awake.
+			// Nothing moves during a nap, so the loop stops until wake() restarts it.
+			running = false;
+			pose( 'sleep' );
+			return;
 		} else if ( near ) {
 			target = pointer.x - WIDTH / 2;
 			speed = CHASE_SPEED;
-		} else if ( now - lastActive > SLEEP_AFTER ) {
-			speed = 0;
-			if ( state !== 'sleep' ) {
-				pose( 'sleep' );
-			}
 		} else if ( Math.abs( target - x ) < 1 && state !== 'sit' ) {
 			pose( 'sit' );
 			until = now + 2000 + Math.random() * 4000;
@@ -196,7 +197,12 @@ ready( () => {
 		}
 	}
 
-	const wake = () => ( lastActive = performance.now() );
+	function wake() {
+		lastActive = performance.now();
+		if ( state === 'sleep' ) {
+			start();
+		}
+	}
 	addEventListener( 'pointermove', ( event ) => {
 		pointer = event;
 		wake();
