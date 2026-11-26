@@ -24,7 +24,7 @@ const mockModel = ( page, hold = false ) =>
 					clone: async () => session,
 					destroy() {},
 					async prompt( messages ) {
-						window.prompts.push( messages[ 0 ].content.find( ( part ) => part.type === 'image' ).value.getAttribute( 'src' ) );
+						window.prompts.push( messages[ 0 ].content.find( ( part ) => part.type === 'image' ).value.src.split( '/' ).pop() );
 						return ' A red bicycle on a quiet street. ';
 					},
 				};
@@ -98,6 +98,18 @@ test( 'shows download progress on the first suggestion', async () => {
 	const { page, close } = await open( ( page ) => mockModel( page, true ) );
 	await page.getByRole( 'button', { name: 'Suggest' } ).first().click();
 	await page.getByText( 'Downloading the model: 50%' ).waitFor();
+	await close();
+} );
+
+test( 'describes an offscreen lazy-loaded image', async () => {
+	const { page, close } = await open( async ( page ) => {
+		await mockModel( page );
+		await addImages( page, '<div style="height:9000px"></div><img src="lighthouse.svg" loading="lazy">' );
+	} );
+	const item = page.locator( 'li' ).filter( { hasText: '4. lighthouse.svg' } );
+	await item.getByRole( 'button', { name: 'Suggest' } ).click();
+	await item.getByText( 'Suggestion ready' ).waitFor( { timeout: 2000 } );
+	assert.deepEqual( await page.evaluate( () => window.prompts ), [ 'lighthouse.svg' ] );
 	await close();
 } );
 

@@ -189,13 +189,17 @@ async function describe( image, onProgress ) {
 	// A clone per image keeps earlier images out of the context.
 	const session = await ( await baseSession ).clone();
 	try {
-		await image.decode();
+		// A copy, because `decode()` on an offscreen `loading="lazy"` image
+		// waits until it is scrolled into view.
+		const copy = new Image();
+		copy.src = image.currentSrc || image.src;
+		await copy.decode();
 		const answer = await session.prompt( [
 			{
 				role: 'user',
 				content: [
 					{ type: 'text', value: 'Write alt text for this image.' },
-					{ type: 'image', value: image },
+					{ type: 'image', value: copy },
 				],
 			},
 		] );
