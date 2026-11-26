@@ -158,10 +158,11 @@ function sphere( element ) {
 	} );
 
 	stage.addEventListener( 'focusin', ( { target: link } ) => {
-		focused = true;
+		// Only keyboard focus counts. Pressing a tag to drag also focuses it, which would
+		// otherwise fight the drag and leave the sphere paused until the visitor clicks elsewhere.
+		focused = link.matches( ':focus-visible' );
 		const i = links.indexOf( link );
-		// Only keyboard focus turns the sphere: a mouse click also focuses, and would fight a drag.
-		if ( i >= 0 && link.matches( ':focus-visible' ) ) {
+		if ( focused && i >= 0 ) {
 			const [ x, y, z ] = points[ i ];
 			const toFront = Math.atan2( -x, z );
 			goal = [ toFront, Math.atan2( y, Math.hypot( x, z ) ) ];

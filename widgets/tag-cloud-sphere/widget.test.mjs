@@ -98,6 +98,27 @@ test( 'spins on drag without following the link under the pointer', async () => 
 	await close();
 } );
 
+test( 'resumes rotating after a drag that starts on a tag', async () => {
+	const { page, close } = await openDemo( SLUG );
+	await page.waitForTimeout( 100 );
+	const { x, y } = await page.locator( 'a' ).evaluateAll( ( links ) => {
+		const front = links.reduce( ( a, b ) => ( Number( b.style.zIndex ) > Number( a.style.zIndex ) ? b : a ) );
+		const box = front.getBoundingClientRect();
+		return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+	} );
+	await page.mouse.move( x, y );
+	await page.mouse.down();
+	await page.mouse.move( x + 60, y, { steps: 5 } );
+	await page.waitForTimeout( 120 );
+	await page.mouse.up();
+	await page.mouse.move( 0, 0 );
+	await page.waitForTimeout( 50 );
+	const before = await transforms( page );
+	await page.waitForTimeout( 200 );
+	assert.notDeepEqual( await transforms( page ), before );
+	await close();
+} );
+
 test( 'spins on touch drag', async () => {
 	const { page, close } = await openDemo( SLUG, { hasTouch: true, reducedMotion: 'reduce' } );
 	const { x, y } = await center( page );
