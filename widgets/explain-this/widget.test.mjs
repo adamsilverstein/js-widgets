@@ -110,6 +110,7 @@ test( 'works from the keyboard and closes with Escape', async () => {
 	await panel( page ).getByText( 'A widget is a small piece' ).waitFor();
 	await page.keyboard.press( 'Escape' );
 	await panel( page ).waitFor( { state: 'hidden' } );
+	assert.ok( await explainButton( page ).evaluate( ( el ) => el.getRootNode().activeElement === el ), 'focus goes back to the button' );
 	await close();
 } );
 

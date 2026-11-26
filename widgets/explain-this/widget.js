@@ -138,6 +138,15 @@ ready( async () => {
 	button.addEventListener( 'click', () => explain( range ) );
 	// Tabbing past the button leaves no selection change to hide it.
 	button.addEventListener( 'focusout', () => setTimeout( onSelectionChange ) );
+	// The popover's own Escape handling leaves focus on <body>, losing a keyboard user's place.
+	panel.addEventListener( 'keydown', ( event ) => {
+		if ( event.key === 'Escape' ) {
+			event.preventDefault();
+			panel.hidePopover();
+			button.showPopover();
+			button.focus();
+		}
+	} );
 	panel.addEventListener( 'toggle', ( event ) => {
 		if ( event.newState === 'closed' ) {
 			request?.abort();
