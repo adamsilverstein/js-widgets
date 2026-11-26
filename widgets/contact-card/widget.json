@@ -1,0 +1,9 @@
+{
+	"name": "Contact Card",
+	"description": "A floating button that opens call and email links and a short contact form.",
+	"category": "utility",
+	"file": "contact",
+	"issue": 3,
+	"snippet": "<script src=\"contact.min.js\" data-phone=\"+15415550100\" data-email=\"hello@example.com\" data-endpoint=\"https://example.com/contact\"></script>",
+	"demoHeight": 540
+}
