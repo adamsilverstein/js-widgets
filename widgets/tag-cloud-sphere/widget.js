@@ -221,8 +221,9 @@ function sphere( element ) {
 	};
 	stage.addEventListener( 'pointerup', release );
 	stage.addEventListener( 'pointercancel', release );
-	// A drag that ends on a link must not follow it. `dragged` outlives `drag` since click comes after pointerup.
-	stage.addEventListener( 'click', ( event ) => dragged && event.preventDefault(), true );
+	// A drag that ends on a link must not follow it. `dragged` outlives `drag` since click comes
+	// after pointerup. A keyboard click has `detail` 0, and Enter on a tag always follows it.
+	stage.addEventListener( 'click', ( event ) => dragged && event.detail && event.preventDefault(), true );
 	stage.addEventListener( 'dragstart', ( event ) => event.preventDefault() );
 
 	if ( ! still ) {

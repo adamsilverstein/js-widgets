@@ -98,6 +98,24 @@ test( 'spins on drag without following the link under the pointer', async () => 
 	await close();
 } );
 
+test( 'Enter still follows a link after a drag', async () => {
+	const { page, close } = await openDemo( SLUG, { reducedMotion: 'reduce' } );
+	const { x, y } = await center( page );
+	await page.mouse.move( x, y );
+	await page.mouse.down();
+	await page.mouse.move( x + 80, y + 30, { steps: 5 } );
+	await page.mouse.up();
+	await page.mouse.move( 0, 0 );
+	// Tab starts from where the drag ended, so the focused tag varies.
+	await page.keyboard.press( 'Tab' );
+	const href = await page.evaluate(
+		() => document.querySelector( '.wp-block-tag-cloud > div' ).shadowRoot.activeElement.getAttribute( 'href' )
+	);
+	await page.keyboard.press( 'Enter' );
+	assert.equal( await page.evaluate( () => location.hash ), href );
+	await close();
+} );
+
 test( 'resumes rotating after a drag that starts on a tag', async () => {
 	const { page, close } = await openDemo( SLUG );
 	await page.waitForTimeout( 100 );
