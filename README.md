@@ -2,7 +2,7 @@
 
 Standalone JavaScript widgets you can add to any site with one paste. No dependencies, no build step, no account.
 
-**[Try every widget in the live gallery](https://adamsilverstein.github.io/js-widgets/)**. Each one has a working demo and a copy button.
+**[Try every widget in the live gallery](https://adamsilverstein.github.io/js-widgets/)**. Each one has a working demo, options you can change in place, and a copy button. Below, click a picture to open that widget's demo, or open "Copy a snippet" under any group and use the copy button on the code.
 
 ## Using a widget
 
@@ -34,7 +34,8 @@ flowchart LR
     B --> C["site/&lt;file&gt;.min.js<br>the file users copy"]
     B --> D["site/demos/&lt;slug&gt;/<br>live demo"]
     B --> E["site/index.html<br>gallery"]
-    C & D & E --> F["GitHub Pages"]
+    D --> P["npm run posters<br>site/posters/&lt;slug&gt;.png"]
+    C & D & E & P --> F["GitHub Pages"]
     B -. "on main" .-> G["README widget list"]
 ```
 

@@ -5,7 +5,7 @@ Copy `widgets/_template` to `widgets/<your-slug>` and edit the files. The build 
 | File | Purpose |
 | --- | --- |
 | `widget.js` | The widget source. Plain JavaScript, may import from `shared/`. |
-| `widget.json` | Name, category, snippet and size budget. Drives the gallery card and the README list. |
+| `widget.json` | Name, category, snippet and size budget. Drives the gallery and the README list. |
 | `demo.html` | The live demo shown in the gallery. |
 | `README.md` | Options and notes for site owners. |
 | `*.test.mjs` | Optional behavior tests, run in headless Chromium. |
@@ -34,7 +34,8 @@ Run `npm run dev -- --template` to see the template itself in the gallery.
 - `snippet` is the script tag users paste, written with the bare file name. The gallery swaps in the hosted URL.
 - `maxBytes` (optional) fails the build when the minified file grows past it.
 - `demoHeight` (optional) is the height of the demo iframe in pixels. Default 280.
-- `requires` (optional) is shown on the card for widgets that need a particular browser.
+- `requires` (optional) is shown above the demo for widgets that need a particular browser.
+- `poster` (optional) is a query string or fragment added to the demo URL for a widget that only shows itself with one, eg. `"poster": "?alt-audit"`. The gallery and the README screenshot both use it.
 
 ## demo.html
 
@@ -42,7 +43,9 @@ Write the demo as a body fragment, with the script tag exactly as a user would p
 
 `<!-- demo:article -->` is replaced with a sample article of about 500 words inside an `<article>` element, for widgets that work on page content.
 
-The demo runs inside an iframe in the gallery, so a widget fixed to a corner shows in the corner of its own card.
+The demo runs inside an iframe in the gallery, so a widget fixed to a corner shows in the corner of its own frame.
+
+The gallery shows the snippet with every `data-` value editable. An edited value reaches the demo through the URL fragment (`demos/<slug>/#data-size=96`), which a small script the build adds to each demo page applies to the widget's script tag before it runs. The demo needs nothing extra for this, as long as it uses the same attributes as the snippet in `widget.json`.
 
 ## Conventions
 
@@ -87,4 +90,4 @@ Do not assume a built-in AI API is missing in headless Chromium: recent builds e
 
 ## Publishing
 
-Merging to `main` runs the `Publish gallery` workflow. It builds the site, deploys it to GitHub Pages, and rewrites the widget list in the README. Do not edit that list by hand or in a pull request.
+Merging to `main` runs the `Publish gallery` workflow. It builds the site, saves a screenshot of every demo (`npm run posters`), deploys both to GitHub Pages, and rewrites the widget list in the README. The README cannot run a demo, so it shows those screenshots, each linking to the live one. Do not edit that list by hand or in a pull request.
