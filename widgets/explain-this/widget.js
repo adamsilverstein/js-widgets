@@ -113,13 +113,8 @@ ready( async () => {
 			return;
 		}
 		range = current.cloneRange();
-		// Placing the host after the selected paragraph makes the button the next Tab stop.
-		const block = blockOf( range.commonAncestorContainer );
-		if ( block === root ) {
-			root.append( host );
-		} else {
-			block.after( host );
-		}
+		// Makes the button the next Tab stop. Appending inside the block keeps tables and lists valid.
+		blockOf( range.commonAncestorContainer ).append( host );
 		host.style.colorScheme = document.documentElement.dataset.theme || 'light dark';
 		place();
 		button.showPopover();

@@ -113,6 +113,17 @@ test( 'works from the keyboard and closes with Escape', async () => {
 	await close();
 } );
 
+test( 'leaves table markup intact', async () => {
+	const { page, close } = await openDemo( 'explain-this', {}, mockModel );
+	await page.evaluate( () =>
+		document.querySelector( 'article' ).insertAdjacentHTML( 'beforeend', '<table><tr><td>Cell one</td><td>Cell two</td></tr></table>' )
+	);
+	await select( page, 'Cell one' );
+	await explainButton( page ).waitFor();
+	assert.deepEqual( await page.evaluate( () => [ ...document.querySelector( 'tr' ).children ].map( ( el ) => el.tagName ) ), [ 'TD', 'TD' ] );
+	await close();
+} );
+
 test( 'keeps the explanation on screen next to the selection', async () => {
 	const { page, close } = await openDemo( 'explain-this', { viewport: { width: 360, height: 640 } }, mockModel );
 	await select( page, 'guestbook' );
