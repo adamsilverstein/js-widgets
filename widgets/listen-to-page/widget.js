@@ -223,9 +223,10 @@ ready( () => {
 				speak( index + 1 );
 			}
 		};
-		utterance.onerror = ( event ) => {
-			// "interrupted" and "canceled" come from our own cancel() calls.
-			if ( mine === token && ! [ 'interrupted', 'canceled' ].includes( event.error ) ) {
+		// Our own cancel() calls bump the token first, so an error that still
+		// matches it came from elsewhere, eg. another script cancelling speech.
+		utterance.onerror = () => {
+			if ( mine === token ) {
 				stop();
 			}
 		};

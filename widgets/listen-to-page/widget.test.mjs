@@ -131,6 +131,14 @@ test( 'stops speaking when the visitor leaves the page', async () => {
 	await close();
 } );
 
+test( 'shows Resume when another script cancels speech', async () => {
+	const { page, close } = await open();
+	await page.getByRole( 'button', { name: 'Listen' } ).click();
+	await page.evaluate( () => speechSynthesis.cancel() );
+	assert.ok( await page.getByRole( 'button', { name: 'Resume' } ).isVisible() );
+	await close();
+} );
+
 test( 'hides itself when there are no voices', async () => {
 	const { page, close } = await open( [] );
 	await page.waitForTimeout( 100 );
