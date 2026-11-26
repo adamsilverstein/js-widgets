@@ -100,7 +100,7 @@ async function audit() {
 function renderItem( image, number, canSuggest ) {
 	const item = document.createElement( 'li' );
 	const name = `${ number }. ${ imageName( image ) }`;
-	item.innerHTML = `<img alt=""><span class="name"></span><span class="where"><button type="button" data-show>Show on page</button></span>
+	item.innerHTML = `<img alt=""><span class="name"></span><span><button type="button" data-show>Show on page</button></span>
 		<textarea placeholder="Describe the image in one sentence"></textarea>
 		<div class="row">${ canSuggest ? '<button type="button" data-suggest>Suggest</button>' : '' }<button type="button" data-copy>Copy</button><span role="status"></span></div>`;
 	item.querySelector( 'img' ).src = image.currentSrc || image.src;
@@ -249,7 +249,11 @@ function addBadges( images, onClick ) {
 	addEventListener( 'scroll', place, { capture: true, passive: true } );
 }
 
-/** Follows the page's `data-theme` when set, otherwise the system setting. */
+/**
+ * Follows the page's `data-theme` when set, otherwise the system setting.
+ *
+ * @param {HTMLElement} host Shadow host whose `color-scheme` drives `light-dark()`.
+ */
 function followPageTheme( host ) {
 	const sync = () => {
 		const theme = document.documentElement.dataset.theme;
