@@ -11,7 +11,13 @@ const widgets = JSON.parse( await readFile( new URL( '../site/widgets.json', imp
 
 for ( const widget of widgets ) {
 	test( `${ widget.name } demo loads cleanly`, async () => {
-		const { page, errors, close } = await openDemo( widget.slug );
+		// Third party requests are blocked, so the run stays offline and shows widgets failing quietly.
+		const { page, errors, close } = await openDemo( widget.slug, {}, ( newPage ) =>
+			newPage.route(
+				( url ) => url.hostname !== '127.0.0.1',
+				( route ) => route.abort()
+			)
+		);
 		const missing = [];
 		page.on( 'response', ( response ) => {
 			if ( response.status() === 404 && response.url().startsWith( 'http://127.0.0.1' ) ) {
