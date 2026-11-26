@@ -115,7 +115,8 @@ test( 'falls back to the plain video when the canvas cannot be read', async () =
 
 	const state = await page.evaluate( () => {
 		const root = document.querySelector( 'div' ).shadowRoot;
-		return { ascii: ! root.querySelector( 'pre' ).hidden, bar: ! root.querySelector( '.bar' ).hidden, inert: document.querySelector( 'video' ).inert };
+		const shown = ( selector ) => getComputedStyle( root.querySelector( selector ) ).display !== 'none';
+		return { ascii: shown( 'pre' ), bar: shown( '.bar' ), inert: document.querySelector( 'video' ).inert };
 	} );
 	assert.deepEqual( state, { ascii: false, bar: false, inert: false } );
 	assert.deepEqual( errors, [] );

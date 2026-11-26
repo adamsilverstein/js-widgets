@@ -34,7 +34,7 @@ pre {
 	background: #000; color: var(--color); cursor: pointer;
 	font: calc(100cqi / var(--cols) / ${ CELL_ASPECT })/1 ui-monospace, Menlo, Consolas, monospace;
 }
-pre[hidden] { display: none; }
+[hidden] { display: none !important; }
 .bar { display: flex; gap: 8px; margin-top: 8px; }
 button { font: inherit; padding: 4px 12px; border-radius: 6px; cursor: pointer; }
 `;
