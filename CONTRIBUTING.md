@@ -81,7 +81,7 @@ test( 'blinks on click', async () => {
 } );
 ```
 
-`openDemo( slug, contextOptions )` takes Playwright context options, eg. `{ reducedMotion: 'reduce' }` or `{ hasTouch: true }`.
+`openDemo( slug, contextOptions )` takes Playwright context options, eg. `{ reducedMotion: 'reduce' }` or `{ hasTouch: true }`. A third argument, `setup( page )`, runs before the page loads. Use it to mock what headless Chromium lacks or a test should not depend on: a built-in AI API with `page.addInitScript()`, or a network request with `page.route()`.
 
 ## Publishing
 

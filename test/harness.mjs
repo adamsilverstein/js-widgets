@@ -26,17 +26,21 @@ after( async () => {
 /**
  * Opens a widget's built demo page. Run `npm run build` first (`npm test` does).
  *
- * @param {string} slug             Widget directory name.
- * @param {Object} [contextOptions] Playwright context options, eg. `{ reducedMotion: 'reduce' }`.
+ * @param {string}   slug             Widget directory name.
+ * @param {Object}   [contextOptions] Playwright context options, eg. `{ reducedMotion: 'reduce' }`.
+ * @param {Function} [setup]          Called with the page before it navigates, eg. to mock a
+ *                                    browser API with `page.addInitScript()` or a request with
+ *                                    `page.route()`.
  * @return {Promise<{page: import('playwright').Page, errors: Error[], close: Function}>}
  *         The page, the uncaught errors it has thrown so far, and a function to close it.
  */
-export async function openDemo( slug, contextOptions = {} ) {
+export async function openDemo( slug, contextOptions = {}, setup ) {
 	const [ browser, server ] = await start();
 	const context = await browser.newContext( contextOptions );
 	const page = await context.newPage();
 	const errors = [];
 	page.on( 'pageerror', ( error ) => errors.push( error ) );
+	await setup?.( page );
 	await page.goto( `${ server.url }demos/${ slug }/` );
 	return { page, errors, close: () => context.close() };
 }
