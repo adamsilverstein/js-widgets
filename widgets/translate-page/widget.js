@@ -93,9 +93,10 @@ ready( async () => {
 	}
 
 	// Inner `lang` attributes would otherwise keep screen readers on the source language.
+	// Untranslated elements keep theirs, since their text stays in that language.
 	const langs = new Map(
 		[ region, ...region.querySelectorAll( '[lang]' ) ]
-			.filter( ( element ) => element.translate )
+			.filter( ( element ) => element.translate && ! element.closest( SKIP ) )
 			.map( ( element ) => [ element, element.getAttribute( 'lang' ) ] )
 	);
 

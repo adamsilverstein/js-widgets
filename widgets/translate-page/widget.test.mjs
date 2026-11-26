@@ -84,7 +84,7 @@ test( 'translates text nodes only, sets lang, and restores the exact original', 
 	await close();
 } );
 
-test( 'leaves code and translate="no" alone', async () => {
+test( 'leaves code and translate="no" alone, lang included', async () => {
 	const { page, close } = await openDemo( 'translate-page', {}, async ( page ) => {
 		await mockTranslator( { de: 'available' } )( page );
 		// Runs before the widget's ready() callback, so the extra markup is collected.
@@ -92,7 +92,7 @@ test( 'leaves code and translate="no" alone', async () => {
 			document.addEventListener( 'DOMContentLoaded', () =>
 				document.querySelector( 'article' ).insertAdjacentHTML(
 					'beforeend',
-					'<p id="mixed">Run <code>npm test</code> on <span translate="no">JS Widgets</span> <a href="#x">today</a>.</p><pre>const a = 1;</pre>'
+					'<p id="mixed">Run <code lang="en">npm test</code> on <span translate="no">JS Widgets</span> <a href="#x">today</a>.</p><pre>const a = 1;</pre>'
 				)
 			)
 		);
@@ -101,7 +101,7 @@ test( 'leaves code and translate="no" alone', async () => {
 	await page.getByRole( 'button', { name: 'Translate', exact: true } ).click();
 	await page.getByText( /Translated to/ ).waitFor();
 
-	assert.equal( await page.locator( '#mixed' ).innerHTML(), '[de] Run <code>npm test</code> [de] on <span translate="no">JS Widgets</span> <a href="#x">[de] today</a>[de] .' );
+	assert.equal( await page.locator( '#mixed' ).innerHTML(), '[de] Run <code lang="en">npm test</code> [de] on <span translate="no">JS Widgets</span> <a href="#x">[de] today</a>[de] .' );
 	assert.equal( await page.locator( 'pre' ).textContent(), 'const a = 1;' );
 	await close();
 } );
