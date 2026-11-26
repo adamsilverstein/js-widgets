@@ -21,7 +21,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npx playwright install --with-deps chromium
       - run: npm run readme
+      # Screenshots the README shows in place of live demos. Published, never committed.
+      - run: npm run posters
       # The README widget list is generated here, not in pull requests, so
       # widget PRs never conflict over it.
       - name: Commit the updated widget list
