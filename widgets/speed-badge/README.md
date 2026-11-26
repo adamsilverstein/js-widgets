@@ -6,7 +6,7 @@ A small "Loaded in 0.83s" badge for your footer. Clicking it opens a panel with 
 <script src="speed.min.js" data-metric="lcp"></script>
 ```
 
-The badge renders where the snippet is pasted.
+The badge renders where the snippet is pasted, so put it in the `<body>`, eg. in your footer. In `<head>` it renders nothing.
 
 ## Options
 
