@@ -23,6 +23,21 @@ const TYPES = {
 };
 
 /**
+ * Streams a file into a response whose headers are already sent. A rebuild can
+ * delete the file between `stat()` and the read, so a failed read drops the
+ * response instead of crashing the server.
+ *
+ * @param {string}                         file     Path to the file.
+ * @param {import('node:http').ServerResponse} response Response to write to.
+ * @param {Object}                         [range]  `start` and `end` byte offsets.
+ */
+function send( file, response, range ) {
+	createReadStream( file, range )
+		.on( 'error', () => response.destroy() )
+		.pipe( response );
+}
+
+/**
  * Serves a directory over HTTP.
  *
  * @param {string} dir    Directory to serve.
@@ -35,7 +50,8 @@ export function serve( dir, port = 0 ) {
 		try {
 			const { pathname } = new URL( request.url, 'http://localhost' );
 			let file = path.join( root, decodeURIComponent( pathname ) );
-			if ( ! file.startsWith( root ) ) {
+			// Compare whole path segments, so a sibling like "site-private" is not let through.
+			if ( file !== root && ! file.startsWith( root + path.sep ) ) {
 				throw new Error( 'Outside root' );
 			}
 			let info = await stat( file );
@@ -54,16 +70,20 @@ export function serve( dir, port = 0 ) {
 				// "bytes=-N" asks for the last N bytes.
 				const start = range[ 1 ] ? Number( range[ 1 ] ) : Math.max( 0, info.size - Number( range[ 2 ] ) );
 				const end = range[ 1 ] && range[ 2 ] ? Math.min( Number( range[ 2 ] ), info.size - 1 ) : info.size - 1;
+				if ( start > end ) {
+					response.writeHead( 416, { 'Content-Range': `bytes */${ info.size }` } ).end();
+					return;
+				}
 				response.writeHead( 206, {
 					...headers,
 					'Content-Range': `bytes ${ start }-${ end }/${ info.size }`,
 					'Content-Length': end - start + 1,
 				} );
-				createReadStream( file, { start, end } ).pipe( response );
+				send( file, response, { start, end } );
 				return;
 			}
 			response.writeHead( 200, { ...headers, 'Content-Length': info.size } );
-			createReadStream( file ).pipe( response );
+			send( file, response );
 		} catch {
 			response.writeHead( 404, { 'Content-Type': 'text/plain' } ).end( 'Not found' );
 		}
