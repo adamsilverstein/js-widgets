@@ -21,6 +21,8 @@ const SHINES = {
 		'linear-gradient(115deg,#0000 15%,#f0a8 30%,#fd08 42%,#0fa8 54%,#0af8 66%,#a0f8 78%,#0000 92%) var(--x) var(--y)/300% 300%',
 };
 
+const clamp = ( value ) => Math.max( -1, Math.min( 1, value ) );
+
 /** Every enhanced card, for device orientation and reduced motion changes. */
 const cards = [];
 
@@ -55,9 +57,9 @@ function enhance( el ) {
 	const paint = () => {
 		el.style.transform =
 			now.x || now.y ? `perspective(800px) rotateX(${ -now.y * maxDeg }deg) rotateY(${ now.x * maxDeg }deg) ${ base }` : restingTransform;
-		overlay?.style.setProperty( '--x', `${ 50 + now.x * 50 }%` );
-		overlay?.style.setProperty( '--y', `${ 50 + now.y * 50 }%` );
 		if ( overlay ) {
+			overlay.style.setProperty( '--x', `${ 50 + now.x * 50 }%` );
+			overlay.style.setProperty( '--y', `${ 50 + now.y * 50 }%` );
 			overlay.style.opacity = now.glow * 0.7;
 		}
 	};
@@ -97,7 +99,7 @@ function enhance( el ) {
 		const rect = el.getBoundingClientRect();
 		const x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
 		const y = ( ( event.clientY - rect.top ) / rect.height ) * 2 - 1;
-		tiltTo( Math.max( -1, Math.min( 1, x ) ), Math.max( -1, Math.min( 1, y ) ), true );
+		tiltTo( clamp( x ), clamp( y ), true );
 	} );
 	// Keyboard focus gets a gentle fixed tilt. The pointer wins while it is over the card.
 	const rest = () =>
@@ -123,8 +125,8 @@ function followOrientation() {
 		rest.beta += ( beta - rest.beta ) * 0.02;
 		rest.gamma += ( gamma - rest.gamma ) * 0.02;
 		// Whole degrees, so sensor noise on a still phone lets the animation settle.
-		const x = Math.max( -1, Math.min( 1, Math.round( gamma - rest.gamma ) / 20 ) );
-		const y = Math.max( -1, Math.min( 1, Math.round( beta - rest.beta ) / 20 ) );
+		const x = clamp( Math.round( gamma - rest.gamma ) / 20 );
+		const y = clamp( Math.round( beta - rest.beta ) / 20 );
 		cards.forEach( ( tiltTo ) => tiltTo( x, y, true ) );
 	} );
 }
