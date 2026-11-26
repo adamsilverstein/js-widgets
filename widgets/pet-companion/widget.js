@@ -144,6 +144,7 @@ ready( () => {
 	function tick( now ) {
 		if ( still.matches || ! host.isConnected ) {
 			running = false;
+			pose( 'sit' );
 			return;
 		}
 		const dt = Math.min( now - ( last || now ), 100 ) / 1000;
