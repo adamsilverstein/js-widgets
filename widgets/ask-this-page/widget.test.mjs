@@ -219,3 +219,15 @@ for ( const position of [ 'bottom-left', 'top-right' ] ) {
 		await close();
 	} );
 }
+
+test( 'follows the page theme, also while closed', async () => {
+	const { page, close } = await openDemo( 'ask-this-page', { colorScheme: 'light' }, mockPromptApi() );
+	const toggle = page.getByRole( 'button', { name: 'Ask this page' } );
+	const background = () => toggle.evaluate( ( button ) => getComputedStyle( button ).backgroundColor );
+	const light = await background();
+	await page.evaluate( () => ( document.documentElement.dataset.theme = 'dark' ) );
+	assert.notEqual( await background(), light );
+	await page.evaluate( () => ( document.documentElement.dataset.theme = 'light' ) );
+	assert.equal( await background(), light );
+	await close();
+} );

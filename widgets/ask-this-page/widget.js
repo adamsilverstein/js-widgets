@@ -30,8 +30,12 @@ const MODEL_OPTIONS = {
 };
 
 // The panel opens away from the corner, so the button stays where it was.
+// :host-context() follows the page's data-theme, and is safe here since the
+// widget only ever renders in Chrome.
 const CSS = `
 :host { color-scheme: light dark; --fg: light-dark(#1d1d1f, #f2f2f2); --bg: light-dark(#fff, #222); --muted: light-dark(#eef0f3, #333); --accent: light-dark(#2f5bd8, #8aa8ff); --on-accent: light-dark(#fff, #111); }
+:host-context([data-theme=light]) { color-scheme: light; }
+:host-context([data-theme=dark]) { color-scheme: dark; }
 * { box-sizing: border-box; }
 .wrap { display: flex; flex-direction: ${ position.startsWith( 'top' ) ? 'column-reverse' : 'column' }; align-items: ${ position.endsWith( 'left' ) ? 'start' : 'end' }; gap: 8px; font: 15px/1.45 system-ui, sans-serif; }
 button { font: inherit; cursor: pointer; border: 0; border-radius: 8px; padding: 8px 12px; background: var(--accent); color: var(--on-accent); }
@@ -152,8 +156,6 @@ ready( async () => {
 	say( 'ai', greeting );
 
 	const setOpen = ( open ) => {
-		const theme = document.documentElement.dataset.theme;
-		root.host.style.colorScheme = theme === 'light' || theme === 'dark' ? theme : '';
 		if ( open ) {
 			dialog.show();
 			input.focus();
