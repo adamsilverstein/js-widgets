@@ -44,6 +44,25 @@ test( 'skips navigation, code blocks, figures and hidden content', async () => {
 	await close();
 } );
 
+test( 'keeps the spaces between inline elements, breaks lines at <br> and skips invisible text', async () => {
+	const { page, close } = await open();
+	await page.evaluate( () => {
+		document.querySelector( 'article h1' ).insertAdjacentHTML(
+			'afterend',
+			`<p style="visibility:hidden">Skip me invisible.</p>
+			<p><em>Very</em> <strong>important</strong> words.</p>
+			<p><span>One.</span> <span>Two.</span></p>
+			<p>Line one<br>line two.</p>`
+		);
+	} );
+	await page.getByRole( 'button', { name: 'Listen' } ).click();
+	for ( let i = 0; i < 5; i++ ) {
+		await page.evaluate( () => window.speech.finish() );
+	}
+	assert.deepEqual( ( await spoken( page ) ).slice( 1 ), [ 'Very important words.', 'One.', 'Two.', 'Line one', 'line two.' ] );
+	await close();
+} );
+
 test( 'uses a voice matching the page language, preferring an exact match', async () => {
 	const voiceUsed = async ( voices ) => {
 		const { page, close } = await open( voices );

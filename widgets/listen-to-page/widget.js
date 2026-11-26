@@ -65,32 +65,41 @@ function voiceFor( lang ) {
  * @return {{text: string, range: Range}[]} Sentences in document order.
  */
 function sentences( root, lang ) {
+	// Whitespace-only text nodes are kept: they are the spaces between inline elements.
 	const walker = document.createTreeWalker( root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, ( node ) => {
-		if ( node.nodeType === Node.TEXT_NODE ) {
-			return node.data.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+		if ( node.nodeType === Node.TEXT_NODE || node.localName === 'br' ) {
+			return NodeFilter.FILTER_ACCEPT;
 		}
-		return node.matches( SKIP ) || ! node.checkVisibility() ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP;
+		return node.matches( SKIP ) || ! node.checkVisibility( { visibilityProperty: true } )
+			? NodeFilter.FILTER_REJECT
+			: NodeFilter.FILTER_SKIP;
 	} );
 
-	// Group text nodes by block, so a sentence never runs from one paragraph into the next.
-	const blocks = new Map();
+	// Split the text nodes into runs at block boundaries and <br>, so a sentence never runs on into the next paragraph or line.
+	const runs = [];
+	let last;
 	for ( let node = walker.nextNode(); node; node = walker.nextNode() ) {
+		if ( node.localName === 'br' ) {
+			last = null;
+			continue;
+		}
 		let block = node.parentElement;
 		while ( block !== root && getComputedStyle( block ).display.startsWith( 'inline' ) ) {
 			block = block.parentElement;
 		}
-		if ( ! blocks.has( block ) ) {
-			blocks.set( block, [] );
+		if ( block !== last ) {
+			runs.push( [] );
+			last = block;
 		}
-		blocks.get( block ).push( node );
+		runs.at( -1 ).push( node );
 	}
 
 	const segmenter = window.Intl?.Segmenter && new Intl.Segmenter( lang, { granularity: 'sentence' } );
 	const result = [];
-	for ( const nodes of blocks.values() ) {
+	for ( const nodes of runs ) {
 		const text = nodes.map( ( node ) => node.data ).join( '' );
 
-		// Maps an offset in the block's text back to a text node and an offset in it.
+		// Maps an offset in the run's text back to a text node and an offset in it.
 		const locate = ( offset ) => {
 			for ( const node of nodes ) {
 				if ( offset <= node.length ) {
@@ -100,7 +109,7 @@ function sentences( root, lang ) {
 			}
 		};
 
-		// Without Intl.Segmenter, each block is read as one sentence.
+		// Without Intl.Segmenter, each run is read as one sentence.
 		const parts = segmenter ? segmenter.segment( text ) : [ { segment: text, index: 0 } ];
 		for ( const { segment, index } of parts ) {
 			const trimmed = segment.trim();
