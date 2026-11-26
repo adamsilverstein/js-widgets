@@ -27,7 +27,7 @@ Place the snippet anywhere after the tag cloud, or in `<head>`: the widget waits
 
 - **Drag** with a mouse, pen or finger to spin the sphere, with a little inertia. A drag that ends on a tag does not follow the link. A plain click or tap does.
 - **Tab** moves through the tags in their original order, and the sphere turns each focused tag to the front.
-- Rotation pauses while the mouse is over the sphere, while a tag has focus, and with the **Pause** button in the corner.
+- Rotation pauses while the mouse is over the sphere, while a tag has keyboard focus, and with the **Pause** button in the corner.
 - With `prefers-reduced-motion: reduce` the sphere does not rotate on its own, has no inertia, and turns a focused tag to the front without animating. Dragging still works.
 - Touch drags over the sphere spin it instead of scrolling the page.
 - The animation stops when the sphere is scrolled out of view, and when nothing is moving.
