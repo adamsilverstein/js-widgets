@@ -25,12 +25,13 @@ A small keyboard visitors can play, for music teachers, band sites and theory bl
   | `, L . ; /` | Continue up from the next C |
   | `Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P` | One octave up, from the next C |
 
-- **MIDI**: in browsers with Web MIDI, a "MIDI off" button appears. Turning it on asks for MIDI access, which may show a permission prompt, then any connected controller plays the synth, including one plugged in later.
+- **MIDI**: in browsers with Web MIDI, a "MIDI off" button appears. Turning it on asks for MIDI access, which may show a permission prompt, then any connected controller plays the synth, including one plugged in later. Notes outside the keyboard's range still sound, without a key lighting up.
 
 ## Notes
 
 - No audio context is created and no sound is made until the visitor presses a key.
-- Notes stop and audio is suspended when the tab is hidden.
+- Audio is suspended a second after the last note is released, and notes stop when the tab is hidden.
+- Paste the snippet in the `<body>`, where the keyboard should appear. Options that are missing or invalid use their defaults.
 - Keys are real buttons labelled with their note names (C4, C♯4, ...). On narrow layouts the black keys hide their visible text but keep their names for screen readers.
 - Volume is capped per note, so a five note chord at full volume just reaches full scale.
 - To embed the synth in an iframe and use MIDI, the iframe needs `allow="midi"`.
