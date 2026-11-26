@@ -4,9 +4,11 @@
  *
  * Options (data- attributes on the script tag):
  *   data-target    CSS selector for the content to answer from. Default "main",
- *                  falling back to <body> when nothing matches.
+ *                  falling back to <body> when nothing matches
+ *                  or the selector is invalid.
  *   data-greeting  First message in the panel. Default "Ask me about this page".
- *   data-position  Corner, eg. "bottom-left". Default "bottom-right".
+ *   data-position  Corner: "top-left", "top-right", "bottom-left" or
+ *                  "bottom-right". Default "bottom-right".
  */
 import { mountCorner, options, ready } from '../../shared/embed.js';
 import { availability, create } from '../../shared/ai.js';

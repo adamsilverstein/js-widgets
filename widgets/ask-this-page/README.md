@@ -10,7 +10,7 @@ A button in the corner opens a small chat panel where visitors ask questions abo
 
 | Attribute | Default | Description |
 | --- | --- | --- |
-| `data-target` | `main` | CSS selector for the content to answer from. Falls back to `<body>` when nothing matches. |
+| `data-target` | `main` | CSS selector for the content to answer from. Falls back to `<body>` when nothing matches or the selector is invalid. |
 | `data-greeting` | `Ask me about this page` | First message shown in the panel. |
 | `data-position` | `bottom-right` | Corner: `top-left`, `top-right`, `bottom-left` or `bottom-right`. |
 
