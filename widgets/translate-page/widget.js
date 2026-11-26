@@ -109,6 +109,10 @@ ready( async () => {
 		[role=status] { flex-basis: 100%; font-size: .9em; opacity: .8; }
 		progress { flex-basis: 100%; }
 	` );
+	// A snippet in <head> would render the picker where it cannot be seen.
+	if ( root.host.closest( 'head' ) ) {
+		region.before( root.host );
+	}
 	root.innerHTML += `<form>
 		<label for="language">Translate to</label>
 		<select id="language"></select>

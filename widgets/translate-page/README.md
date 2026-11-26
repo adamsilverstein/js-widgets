@@ -6,7 +6,7 @@ A small language picker that translates an article in place, on the visitor's de
 <script src="translate.min.js" data-target="article" data-languages="es,fr,de,ja"></script>
 ```
 
-The picker renders where the snippet is pasted, so put it just above the article.
+The picker renders where the snippet is pasted, so put it just above the article. A snippet in `<head>` renders the picker just above the target instead.
 
 ## Options
 

@@ -155,3 +155,21 @@ test( 'falls back to the Language Detector when the page has no lang', async () 
 	assert.equal( await page.locator( 'article' ).getAttribute( 'lang' ), null );
 	await close();
 } );
+
+test( 'renders above the region when the snippet is in <head>', async () => {
+	const { page, close } = await openDemo( 'translate-page', {}, async ( page ) => {
+		await mockTranslator( { es: 'available' } )( page );
+		await page.route( '**/demos/translate-page/', async ( route ) => {
+			const response = await route.fetch();
+			const html = await response.text();
+			const [ snippet ] = html.match( /<script src="[^"]*translate\.min\.js"[^>]*><\/script>/ );
+			await route.fulfill( { response, body: html.replace( snippet, '' ).replace( '</head>', `${ snippet }</head>` ) } );
+		} );
+	} );
+	const button = page.getByRole( 'button', { name: 'Translate', exact: true } );
+	await button.waitFor();
+	assert.equal( await page.evaluate( () => document.querySelector( 'article' ).previousElementSibling.shadowRoot !== null ), true );
+	await button.click();
+	await page.getByText( /Translated to/ ).waitFor();
+	await close();
+} );
