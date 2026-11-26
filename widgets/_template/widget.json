@@ -1,0 +1,10 @@
+{
+	"name": "Hello Widget",
+	"description": "One sentence on what the widget does, shown on its gallery card.",
+	"category": "fun",
+	"file": "hello",
+	"issue": 0,
+	"snippet": "<script src=\"hello.min.js\" data-name=\"world\"></script>",
+	"maxBytes": 1024,
+	"demoHeight": 160
+}

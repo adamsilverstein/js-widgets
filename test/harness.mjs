@@ -1,0 +1,60 @@
+/**
+ * Test helpers: one headless Chromium and one static server per test file,
+ * started on first use and stopped when the file's tests finish.
+ */
+import { after } from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { chromium } from 'playwright';
+import { serve } from '../scripts/serve.mjs';
+
+let started;
+
+const start = () =>
+	( started ??= Promise.allSettled( [
+		chromium.launch(),
+		serve( fileURLToPath( new URL( '../site', import.meta.url ) ) ),
+	] ) );
+
+// Closes whichever of the two did start, so a failed launch cannot leave the server holding the process open.
+after( async () => {
+	const [ browser, server ] = ( await started ) ?? [];
+	await browser?.value?.close();
+	await server?.value?.close();
+} );
+
+/**
+ * Opens a page of the built site. Run `npm run build` first (`npm test` does).
+ *
+ * @param {string}   target           Path within `site/`, eg. `demos/googly-eyes/` or `#googly-eyes`.
+ * @param {Object}   [contextOptions] Playwright context options, eg. `{ reducedMotion: 'reduce' }`.
+ * @param {Function} [setup]          Called with the page before it navigates, eg. to mock a
+ *                                    browser API with `page.addInitScript()` or a request with
+ *                                    `page.route()`.
+ * @return {Promise<{page: import('playwright').Page, errors: Error[], close: Function}>}
+ *         The page, the uncaught errors it has thrown so far, and a function to close it.
+ */
+export async function openPage( target, contextOptions = {}, setup ) {
+	const results = await start();
+	const failed = results.find( ( result ) => result.status === 'rejected' );
+	if ( failed ) {
+		throw failed.reason;
+	}
+	const [ browser, server ] = results.map( ( result ) => result.value );
+	const context = await browser.newContext( contextOptions );
+	const page = await context.newPage();
+	const errors = [];
+	page.on( 'pageerror', ( error ) => errors.push( error ) );
+	await setup?.( page );
+	await page.goto( server.url + target );
+	return { page, errors, close: () => context.close() };
+}
+
+/**
+ * Opens a widget's built demo page. Takes the same options as `openPage()`.
+ *
+ * @param {string}   slug             Widget directory name.
+ * @param {Object}   [contextOptions] Playwright context options.
+ * @param {Function} [setup]          Called with the page before it navigates.
+ * @return {ReturnType<typeof openPage>} The page, its errors and a function to close it.
+ */
+export const openDemo = ( slug, contextOptions, setup ) => openPage( `demos/${ slug }/`, contextOptions, setup );
