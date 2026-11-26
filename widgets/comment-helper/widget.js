@@ -163,6 +163,10 @@ function attach( field, getSession ) {
 				} finally {
 					chat.destroy();
 				}
+				// An empty reply would blank the textarea if accepted, so treat it as a failure.
+				if ( ! suggestion ) {
+					throw new Error( 'Empty reply' );
+				}
 				setBusy( false );
 				if ( suggestion === text.trim() ) {
 					status.textContent = 'No changes to suggest.';

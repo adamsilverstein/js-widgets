@@ -14,7 +14,7 @@ const mockApi = ( state = 'available' ) => ( page ) =>
 		class Session {
 			async prompt( input ) {
 				window.__prompts.push( input );
-				return `FIXED: ${ input.split( 'Text:\n' )[ 1 ] }\n`;
+				return window.__reply ?? `FIXED: ${ input.split( 'Text:\n' )[ 1 ] }\n`;
 			}
 			async clone() {
 				return new Session();
@@ -160,6 +160,16 @@ test( 'shows download progress, and sends nothing over the network', async () =>
 	await page.getByRole( 'region', { name: 'Suggestion' } ).waitFor();
 	assert.equal( await page.evaluate( () => window.__prompts.length ), 1 );
 	assert.deepEqual( requests, [] );
+	await close();
+} );
+
+test( 'treats an empty reply as a failure, so accepting cannot blank the text', async () => {
+	const { page, close } = await openDemo( 'comment-helper', {}, mockApi() );
+	await page.evaluate( () => ( window.__reply = '  \n' ) );
+	await page.getByRole( 'button', { name: 'Shorter' } ).click();
+	await page.locator( 'p[role=status]' ).getByText( 'No suggestion this time' ).waitFor();
+	assert.equal( await page.getByRole( 'region', { name: 'Suggestion' } ).isVisible(), false );
+	assert.equal( await page.locator( '#comment' ).inputValue(), sample );
 	await close();
 } );
 
