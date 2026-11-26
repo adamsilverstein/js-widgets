@@ -1,0 +1,10 @@
+{
+	"name": "Confetti Cannon",
+	"description": "Celebrates a click, or any moment your code chooses, with a burst of confetti.",
+	"category": "fun",
+	"file": "confetti",
+	"issue": 8,
+	"snippet": "<script src=\"confetti.min.js\" data-trigger=\".celebrate\" data-colors=\"#f60,#09f,#fc0\"></script>",
+	"maxBytes": 2048,
+	"demoHeight": 300
+}
