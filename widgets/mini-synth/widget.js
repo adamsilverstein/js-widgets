@@ -29,7 +29,8 @@ const octaves = Math.min( 3, Math.max( 1, parseInt( opts.octaves, 10 ) || 2 ) );
 const low = 60 - 12 * Math.floor( ( octaves - 1 ) / 2 );
 const high = low + octaves * 12;
 let wave = WAVES.includes( opts.wave ) ? opts.wave : 'sine';
-let volume = Math.min( 100, Math.max( 0, parseFloat( opts.volume ) || 0 ) ) / 100;
+const startVolume = parseFloat( opts.volume );
+let volume = Math.min( 100, Math.max( 0, Number.isNaN( startVolume ) ? 50 : startVolume ) ) / 100;
 
 // Peak gain of one note. Five notes at full volume sum to 1, so chords rarely clip.
 const VOICE_GAIN = 0.2;

@@ -33,6 +33,18 @@ const instrument = ( page ) =>
 		};
 	} );
 
+/**
+ * Replaces the demo page with `body`, for options and layouts the demo does not use.
+ *
+ * @param {string} body Body markup. `synth.min.js` resolves as in the demo.
+ */
+const withBody = ( body ) => async ( page ) => {
+	await instrument( page );
+	await page.route( '**/demos/mini-synth/', ( route ) =>
+		route.fulfill( { contentType: 'text/html', body: `<!doctype html><body>${ body.replaceAll( 'synth.min.js', '../../synth.min.js' ) }` } )
+	);
+};
+
 const stats = ( page ) => page.evaluate( () => window.__audio );
 const lit = ( page ) => page.evaluate( () => [ ...document.querySelector( 'script[src*="synth"]' ).nextElementSibling.shadowRoot.querySelectorAll( '.on' ) ].map( ( key ) => key.textContent ) );
 
@@ -136,5 +148,18 @@ test( 'requests MIDI only when turned on, then plays from it', async () => {
 	await page.getByRole( 'button', { name: 'MIDI on' } ).click();
 	await page.evaluate( () => window.__midi.send( [ 0x90, 60, 100 ] ) );
 	assert.deepEqual( await lit( page ), [] );
+	await close();
+} );
+
+test( 'falls back to defaults for bad options', async () => {
+	const { page, errors, close } = await openDemo(
+		'mini-synth',
+		{},
+		withBody( '<script src="synth.min.js" data-octaves="many" data-wave="organ" data-volume="loud"></script>' )
+	);
+	assert.equal( await page.getByRole( 'group', { name: 'Piano keyboard' } ).getByRole( 'button' ).count(), 25 );
+	assert.equal( await page.getByRole( 'combobox' ).inputValue(), 'sine' );
+	assert.equal( await page.getByRole( 'slider' ).inputValue(), '50' );
+	assert.deepEqual( errors, [] );
 	await close();
 } );
