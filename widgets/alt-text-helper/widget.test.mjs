@@ -36,6 +36,14 @@ const mockModel = ( page, hold = false ) =>
 /** Removes the built-in API, which some Chromium builds expose. */
 const removeModel = ( page ) => page.addInitScript( () => delete self.LanguageModel );
 
+/** Adds markup to the end of the demo page, before the widget's script tag. */
+const addImages = ( page, html ) =>
+	page.route( /\/demos\/alt-text-helper\/(\?.*)?$/, async ( route ) => {
+		const response = await route.fetch();
+		const body = ( await response.text() ).replace( '<script src=', `${ html }<script src=` );
+		await route.fulfill( { response, body } );
+	} );
+
 /** Opens the demo, by default in audit mode, after `page.goto()` has run. */
 async function open( setup, search = '?alt-audit', contextOptions = {} ) {
 	const demo = await openDemo( 'alt-text-helper', contextOptions, setup );
@@ -99,6 +107,20 @@ test( 'a badge moves keyboard focus to its entry', async () => {
 	await page.keyboard.press( 'Enter' );
 	const focused = await page.evaluate( () => document.querySelector( '[data-jsw-corner] div' ).shadowRoot.activeElement?.closest( 'li' )?.querySelector( '.name' ).textContent );
 	assert.equal( focused, '2. coffee-cup.svg' );
+	await close();
+} );
+
+test( 'names images whose src has no file name or is not valid percent-encoding', async () => {
+	const { page, errors, close } = await open( async ( page ) => {
+		await mockModel( page );
+		await addImages( page, '<img src="100%.svg"><img>' );
+	} );
+	await page.getByText( 'Alt text audit: 5 images missing alt' ).waitFor();
+	assert.deepEqual( ( await page.locator( 'li .name' ).allTextContents() ).slice( 3 ), [
+		'4. 100%.svg',
+		'5. Image with no src',
+	] );
+	assert.deepEqual( errors, [] );
 	await close();
 } );
 

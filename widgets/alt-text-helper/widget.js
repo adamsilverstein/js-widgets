@@ -143,13 +143,27 @@ function renderItem( image, number, canSuggest ) {
 	return item;
 }
 
-/** A short, readable name for an image: its file name, or "Inline image". */
+/**
+ * A short, readable name for an image, usually its file name.
+ *
+ * @param {HTMLImageElement} image Image to name.
+ * @return {string} The name.
+ */
 function imageName( image ) {
 	const src = image.currentSrc || image.src;
+	if ( ! src ) {
+		return 'Image with no src';
+	}
 	if ( src.startsWith( 'data:' ) ) {
 		return 'Inline image';
 	}
-	return decodeURIComponent( new URL( src, location.href ).pathname.split( '/' ).pop() ) || src;
+	const file = new URL( src ).pathname.split( '/' ).pop();
+	try {
+		return decodeURIComponent( file ) || src;
+	} catch {
+		// A stray `%`, as in `100%.png`, is not valid percent-encoding.
+		return file;
+	}
 }
 
 let baseSession;
