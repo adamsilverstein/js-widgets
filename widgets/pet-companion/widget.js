@@ -203,14 +203,17 @@ ready( () => {
 			start();
 		}
 	}
+	// Aborted when the visitor hides the pet, to remove the page-wide listeners.
+	const controller = new AbortController();
+	const { signal } = controller;
 	addEventListener( 'pointermove', ( event ) => {
 		pointer = event;
 		wake();
-	}, { passive: true } );
-	addEventListener( 'scroll', wake, { passive: true } );
-	addEventListener( 'keydown', wake );
-	document.documentElement.addEventListener( 'pointerleave', () => ( pointer = null ) );
-	still.addEventListener( 'change', start );
+	}, { passive: true, signal } );
+	addEventListener( 'scroll', wake, { passive: true, signal } );
+	addEventListener( 'keydown', wake, { signal } );
+	document.documentElement.addEventListener( 'pointerleave', () => ( pointer = null ), { signal } );
+	still.addEventListener( 'change', start, { signal } );
 
 	pet.addEventListener( 'click', () => {
 		wake();
@@ -226,6 +229,7 @@ ready( () => {
 
 	button.addEventListener( 'click', () => {
 		host.remove();
+		controller.abort();
 		try {
 			sessionStorage.setItem( STORAGE_KEY, '1' );
 		} catch {}

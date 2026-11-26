@@ -128,6 +128,10 @@ test( 'stays hidden for the session once dismissed', async () => {
 	const { page, close } = await openDemo( 'pet-companion' );
 	await page.getByRole( 'button', { name: 'Hide the pet' } ).click( { force: true } );
 	assert.equal( await page.locator( '.pet' ).count(), 0 );
+	const cdp = await page.context().newCDPSession( page );
+	const { result } = await cdp.send( 'Runtime.evaluate', { expression: 'window' } );
+	const { listeners } = await cdp.send( 'DOMDebugger.getEventListeners', { objectId: result.objectId } );
+	assert.deepEqual( listeners.map( ( l ) => l.type ), [], 'no listeners left on window' );
 	await page.reload();
 	await page.waitForTimeout( 200 );
 	assert.equal( await page.locator( '.pet' ).count(), 0 );
