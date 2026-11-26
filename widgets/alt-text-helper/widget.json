@@ -1,0 +1,11 @@
+{
+	"name": "Alt Text Helper",
+	"description": "Add ?alt-audit to a page to list images missing alt text and draft a description for each with on-device AI.",
+	"category": "ai",
+	"file": "alt",
+	"issue": 19,
+	"snippet": "<script src=\"alt.min.js\" data-param=\"alt-audit\"></script>",
+	"demoHeight": 480,
+	"requires": "Chrome 148 or later on desktop for suggestions",
+	"poster": "?alt-audit"
+}

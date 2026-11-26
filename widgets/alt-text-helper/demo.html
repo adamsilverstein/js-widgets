@@ -1,0 +1,20 @@
+<style>
+	.photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+	.photos img { display: block; width: 100%; height: auto; border-radius: 6px; }
+	.rule { display: block; width: 100%; height: 12px; margin: 16px 0; }
+</style>
+
+<h1>Weekend photos</h1>
+<p><a href="?alt-audit">Run the alt text audit</a> · <a href="./">Back to the normal page</a></p>
+
+<ul class="photos">
+	<li><img src="hills-at-sunset.svg" width="320" height="200"></li>
+	<li><img src="coffee-cup.svg" width="320" height="200"></li>
+	<li><img src="red-bicycle.svg" width="320" height="200"></li>
+	<li><img src="lighthouse.svg" width="320" height="200" alt="A striped lighthouse shining over the sea at night."></li>
+</ul>
+<img class="rule" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 4' preserveAspectRatio='none'%3E%3Cpath d='M0 2H100' stroke='%23999' stroke-dasharray='2 2'/%3E%3C/svg%3E">
+<p class="demo-note">Three of these images have no alt text. Suggestions need Chrome 148 or later on desktop, with the Prompt API.</p>
+<p>The lighthouse already has alt text, and the dotted rule above has <code>alt=""</code> because it is decorative. The audit leaves both alone.</p>
+
+<script src="alt.min.js" data-param="alt-audit"></script>
