@@ -25,11 +25,13 @@ const instrument = ( page ) =>
 			stats.playing--;
 			return stop.apply( this, args );
 		};
-		const input = { onmidimessage: null };
-		window.__midi = { send: ( data ) => input.onmidimessage?.( { data } ) };
+		const input = new EventTarget();
+		window.__midi = {
+			send: ( data ) => input.dispatchEvent( Object.assign( new Event( 'midimessage' ), { data } ) ),
+		};
 		navigator.requestMIDIAccess = async () => {
 			stats.midiRequests++;
-			return { inputs: new Map( [ [ 'fake', input ] ] ), onstatechange: null };
+			return Object.assign( new EventTarget(), { inputs: new Map( [ [ 'fake', input ] ] ) } );
 		};
 	} );
 
@@ -161,5 +163,30 @@ test( 'falls back to defaults for bad options', async () => {
 	assert.equal( await page.getByRole( 'combobox' ).inputValue(), 'sine' );
 	assert.equal( await page.getByRole( 'slider' ).inputValue(), '50' );
 	assert.deepEqual( errors, [] );
+	await close();
+} );
+
+test( 'several synths share one MIDI controller', async () => {
+	const { page, close } = await openDemo(
+		'mini-synth',
+		{},
+		withBody( '<script src="synth.min.js"></script><script src="synth.min.js"></script>' )
+	);
+	const toggles = page.getByRole( 'button', { name: 'MIDI off' } );
+	await toggles.first().click();
+	await page.getByRole( 'button', { name: 'MIDI on' } ).waitFor();
+	await toggles.first().click();
+	await page.getByRole( 'button', { name: 'MIDI on' } ).nth( 1 ).waitFor();
+	const both = () =>
+		page.evaluate( () => [ ...document.querySelectorAll( 'body > div' ) ].map( ( host ) => host.shadowRoot.querySelectorAll( '.on' ).length ) );
+
+	await page.evaluate( () => window.__midi.send( [ 0x90, 64, 100 ] ) );
+	assert.deepEqual( await both(), [ 1, 1 ] );
+	await page.evaluate( () => window.__midi.send( [ 0x80, 64, 0 ] ) );
+
+	// Turning one off leaves the other listening.
+	await page.getByRole( 'button', { name: 'MIDI on' } ).first().click();
+	await page.evaluate( () => window.__midi.send( [ 0x90, 64, 100 ] ) );
+	assert.deepEqual( await both(), [ 0, 1 ] );
 	await close();
 } );

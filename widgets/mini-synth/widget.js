@@ -231,6 +231,7 @@ document.addEventListener( 'visibilitychange', () => {
 
 // MIDI is requested only when the visitor turns it on, since it can show a permission prompt.
 let midi;
+let midiOn = false;
 const onMidi = ( { data: [ status, note, velocity ] } ) => {
 	const type = status & 0xf0;
 	if ( type === 0x90 && velocity > 0 ) {
@@ -239,23 +240,26 @@ const onMidi = ( { data: [ status, note, velocity ] } ) => {
 		noteOff( `m${ note }` );
 	}
 };
-const listen = ( on ) => midi?.inputs.forEach( ( input ) => ( input.onmidimessage = on ? onMidi : null ) );
+// Listeners rather than `onmidimessage`, so several synths on a page can share a controller.
+const listen = () =>
+	midi.inputs.forEach( ( input ) => input[ midiOn ? 'addEventListener' : 'removeEventListener' ]( 'midimessage', onMidi ) );
 
 midiButton?.addEventListener( 'click', async () => {
-	const on = midiButton.getAttribute( 'aria-pressed' ) !== 'true';
-	if ( on ) {
+	if ( ! midi ) {
 		try {
-			midi ??= await navigator.requestMIDIAccess();
+			midi = await navigator.requestMIDIAccess();
 		} catch {
 			midiButton.textContent = 'MIDI blocked';
 			return;
 		}
-		// Plugging in a controller later should work without toggling again.
-		midi.onstatechange = () => listen( midiButton.getAttribute( 'aria-pressed' ) === 'true' );
-	} else {
+		// A controller plugged in later plays without toggling again.
+		midi.addEventListener( 'statechange', listen );
+	}
+	midiOn = ! midiOn;
+	if ( ! midiOn ) {
 		stopAll( 'm' );
 	}
-	listen( on );
-	midiButton.setAttribute( 'aria-pressed', on );
-	midiButton.textContent = on ? 'MIDI on' : 'MIDI off';
+	listen();
+	midiButton.setAttribute( 'aria-pressed', midiOn );
+	midiButton.textContent = midiOn ? 'MIDI on' : 'MIDI off';
 } );
