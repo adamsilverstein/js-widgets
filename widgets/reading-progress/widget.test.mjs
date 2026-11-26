@@ -108,3 +108,21 @@ test( 'lets clicks through to the page under the bar and pill', async () => {
 	assert.deepEqual( hits, [ false, false ] );
 	await close();
 } );
+
+test( 'treats data-color as a color, not markup', async () => {
+	const { page, errors, close } = await openDemo( 'reading-progress', {}, ( p ) =>
+		p.route( '**/demos/reading-progress/', async ( route ) => {
+			const response = await route.fetch();
+			const body = ( await response.text() ).replace(
+				'data-color="#f60"',
+				'data-color="red}&lt;/style>&lt;img src=x onerror=window.injected=1>"'
+			);
+			await route.fulfill( { response, body } );
+		} )
+	);
+	await page.waitForLoadState( 'load' );
+	assert.equal( await page.evaluate( () => window.injected ), undefined );
+	assert.equal( await page.locator( `${ HOST } img` ).count(), 0 );
+	assert.deepEqual( errors, [] );
+	await close();
+} );
