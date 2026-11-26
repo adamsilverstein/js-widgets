@@ -1,0 +1,10 @@
+{
+	"name": "Googly Eyes",
+	"description": "A pair of eyes that follows the visitor's pointer around the page, blinks, and goes wide on click.",
+	"category": "fun",
+	"file": "eyes",
+	"issue": 1,
+	"snippet": "<script src=\"eyes.min.js\" data-size=\"64\" data-color=\"#222\"></script>",
+	"maxBytes": 2048,
+	"demoHeight": 220
+}
