@@ -59,7 +59,7 @@ ready( () => {
 	/**
 	 * Returns a Range for every case insensitive match of `query` in the scope.
 	 * Text nodes are searched as one string, so a match can span inline
-	 * elements such as half a phrase in bold.
+	 * elements such as half a phrase in bold, but not a block or `<br>`.
 	 *
 	 * @param {string} query Lowercased search text.
 	 * @return {Range[]} Ranges in document order.
@@ -68,12 +68,27 @@ ready( () => {
 		const nodes = [];
 		const starts = [];
 		let text = '';
-		const walker = document.createTreeWalker( scope, NodeFilter.SHOW_TEXT );
+		let block;
+		const walker = document.createTreeWalker( scope, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT );
 		for ( let node; ( node = walker.nextNode() ); ) {
-			const parent = node.parentElement;
+			if ( node.tagName === 'BR' ) {
+				block = null;
+			}
+			if ( node.nodeType !== Node.TEXT_NODE ) {
+				continue;
+			}
+			let parent = node.parentElement;
 			// Skip hidden text, except in closed <details>, which open when a match is reached.
 			if ( ! parent.checkVisibility() && ! parent.closest( 'details:not([open])' ) ) {
 				continue;
+			}
+			while ( parent !== scope && getComputedStyle( parent ).display.startsWith( 'inline' ) ) {
+				parent = parent.parentElement;
+			}
+			// The search box cannot hold a line break, so this keeps matches inside one block.
+			if ( parent !== block ) {
+				block = parent;
+				text += '\n';
 			}
 			const lower = node.data.toLowerCase();
 			nodes.push( node );

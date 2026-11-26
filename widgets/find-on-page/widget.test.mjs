@@ -72,6 +72,20 @@ test( 'matches across inline elements, and opens a closed details element to sho
 	await close();
 } );
 
+test( 'does not match across blocks or line breaks', async () => {
+	const { page, close } = await openDemo( 'find-on-page' );
+	await page.evaluate( () =>
+		document.querySelector( 'main' ).insertAdjacentHTML( 'beforeend', '<p>alpha one</p><p>two beta</p><ul><li>red</li><li>blue</li></ul><p>line a<br>line b</p>' )
+	);
+	for ( const query of [ 'onetwo', 'redblue', 'aline' ] ) {
+		await page.getByRole( 'searchbox' ).fill( query );
+		assert.equal( ( await state( page ) ).matches, 0, query );
+	}
+	await page.getByRole( 'searchbox' ).fill( 'alpha one' );
+	assert.equal( ( await state( page ) ).matches, 1 );
+	await close();
+} );
+
 test( 'the hotkey focuses the box, but not while typing elsewhere', async () => {
 	const { page, close } = await openDemo( 'find-on-page' );
 	const input = page.getByRole( 'searchbox' );

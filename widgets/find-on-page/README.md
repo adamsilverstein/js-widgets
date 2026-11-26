@@ -25,8 +25,9 @@ A small search box that floats in a corner of the page and highlights every matc
 ## Notes
 
 - Matches are painted with the [CSS Custom Highlight API](https://developer.mozilla.org/en-US/docs/Web/API/CSS_Custom_Highlight_API), so no `<mark>` elements are added and the page's own scripts see the same DOM as before. The one change it makes is opening a closed `<details>` element when the visitor steps to a match inside it.
-- Matching is case insensitive and literal: no fuzzy matching or regular expressions. A match can span inline elements, eg. a phrase that is half in bold.
+- Matching is case insensitive and literal: no fuzzy matching or regular expressions. A match can span inline elements, eg. a phrase that is half in bold, but not two paragraphs, list items or lines split by `<br>`.
 - Text hidden with CSS or the `hidden` attribute is left out of the count.
+- Use one per page: a second copy would replace the first one's highlights.
 - The match count is in a status region, so screen readers announce it.
 - The active match is scrolled into view in the window. Scrolling is instant when the visitor prefers reduced motion. Matches inside a separately scrolling box are not scrolled to.
 - Highlight colors are fixed: yellow for matches, orange for the active one, both with black text so they read on light and dark pages. The box follows `data-theme` on `<html>`, or the system color scheme.
