@@ -76,14 +76,14 @@ function action( href, title, value ) {
 if ( ( phone || email || endpoint ) && Object.hasOwn( HTMLElement.prototype, 'popover' ) ) {
 	ready( () => {
 		const root = mountCorner( CSS, position );
-		root.innerHTML += `<button class="toggle" type="button">${ ICON }</button>
-<div class="card" popover role="dialog" aria-labelledby="title">
-	<header><h2 id="title"></h2><button class="close" type="button" aria-label="Close">&times;</button></header>
+		root.innerHTML += `<button class="toggle" type="button" popovertarget="card">${ ICON }</button>
+<div class="card" id="card" popover role="dialog" aria-labelledby="title">
+	<header><h2 id="title"></h2><button class="close" type="button" popovertarget="card" popovertargetaction="hide" aria-label="Close">&times;</button></header>
 	<div class="actions"></div>
 	${ endpoint ? FORM : '' }
 </div>`;
 
-		const [ toggle, close ] = root.querySelectorAll( 'button' );
+		const toggle = root.querySelector( '.toggle' );
 		const card = root.querySelector( '.card' );
 		const actions = root.querySelector( '.actions' );
 
@@ -91,8 +91,6 @@ if ( ( phone || email || endpoint ) && Object.hasOwn( HTMLElement.prototype, 'po
 		root.host.style.setProperty( '--accent', color );
 		toggle.setAttribute( 'aria-label', label );
 		root.querySelector( 'h2' ).textContent = label;
-		toggle.popoverTargetElement = close.popoverTargetElement = card;
-		close.popoverTargetAction = 'hide';
 
 		if ( phone ) {
 			actions.append( action( `tel:${ phone.replace( /[^\d+]/g, '' ) }`, 'Call', phone ) );
