@@ -1,0 +1,33 @@
+<style>
+	.cards { display: flex; gap: 16px; justify-content: center; padding: 8px 0; }
+	.card {
+		width: 150px;
+		padding: 16px;
+		border-radius: 14px;
+		color: #fff;
+		box-shadow: 0 10px 24px #0004;
+	}
+	.card h2 { margin: 0 0 4px; font-size: 1.1rem; }
+	.card p { margin: 0 0 12px; font-size: 0.85rem; }
+	.card a { color: inherit; }
+	.card .avatar { width: 56px; height: 56px; margin-bottom: 8px; border-radius: 50%; background: linear-gradient(135deg, #fda, #f6a); }
+	.profile { background: linear-gradient(160deg, #2b2d6e, #14152f); }
+	.badge { background: linear-gradient(160deg, #0e6d5c, #0a2f3a); }
+</style>
+
+<div class="cards">
+	<div class="card profile">
+		<div class="avatar"></div>
+		<h2>Ada Lovelace</h2>
+		<p>First programmer. Try selecting this text.</p>
+		<a href="#profile">View profile</a>
+	</div>
+	<div class="card badge">
+		<h2>Gold member</h2>
+		<p>Each card tilts on its own. Tab to the button to see focus.</p>
+		<button type="button" onclick="this.textContent = 'Clicked'">Claim</button>
+	</div>
+</div>
+<p class="demo-note">Move the pointer over a card. On a phone, tilt the phone.</p>
+
+<script src="tilt.min.js" data-target=".card" data-max="15" data-shine="holo"></script>

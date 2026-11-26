@@ -1,0 +1,10 @@
+{
+	"name": "Tilt Card",
+	"description": "Gives any element a 3D tilt toward the pointer and a holographic shine that moves with the angle.",
+	"category": "fun",
+	"file": "tilt",
+	"issue": 15,
+	"snippet": "<script src=\"tilt.min.js\" data-target=\".card\" data-max=\"15\" data-shine=\"holo\"></script>",
+	"maxBytes": 2560,
+	"demoHeight": 320
+}
