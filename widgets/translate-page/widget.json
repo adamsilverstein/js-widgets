@@ -1,0 +1,10 @@
+{
+	"name": "Translate This Page",
+	"description": "A language picker that translates an article in place on the visitor's device, with a button to show the original.",
+	"category": "ai",
+	"file": "translate",
+	"issue": 12,
+	"snippet": "<script src=\"translate.min.js\" data-target=\"article\" data-languages=\"es,fr,de,ja\"></script>",
+	"demoHeight": 380,
+	"requires": "Chrome 138 or later on desktop"
+}
