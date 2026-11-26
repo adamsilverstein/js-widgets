@@ -29,10 +29,11 @@ const MODEL_OPTIONS = {
 	expectedOutputs: [ { type: 'text', languages: [ 'en' ] } ],
 };
 
+// The panel opens away from the corner, so the button stays where it was.
 const CSS = `
 :host { color-scheme: light dark; --fg: light-dark(#1d1d1f, #f2f2f2); --bg: light-dark(#fff, #222); --muted: light-dark(#eef0f3, #333); --accent: light-dark(#2f5bd8, #8aa8ff); --on-accent: light-dark(#fff, #111); }
 * { box-sizing: border-box; }
-.wrap { display: flex; flex-direction: column; align-items: end; gap: 8px; font: 15px/1.45 system-ui, sans-serif; }
+.wrap { display: flex; flex-direction: ${ position.startsWith( 'top' ) ? 'column-reverse' : 'column' }; align-items: ${ position.endsWith( 'left' ) ? 'start' : 'end' }; gap: 8px; font: 15px/1.45 system-ui, sans-serif; }
 button { font: inherit; cursor: pointer; border: 0; border-radius: 8px; padding: 8px 12px; background: var(--accent); color: var(--on-accent); }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .toggle { display: flex; align-items: center; gap: 6px; border-radius: 999px; padding: 10px 16px; box-shadow: 0 2px 10px #0004; }

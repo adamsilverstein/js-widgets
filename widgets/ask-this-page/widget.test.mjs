@@ -70,6 +70,21 @@ const removePromptApi = ( page ) => page.addInitScript( () => delete window.Lang
 /** The widget's answer bubbles, which Playwright finds through the shadow root. */
 const answer = ( page, text ) => page.locator( '.msg.ai', { hasText: text } );
 
+/**
+ * Mocks the Prompt API and serves the demo with other script tag attributes.
+ *
+ * @param {string} attributes Replaces the demo's `data-target` attribute.
+ * @return {Function} An `openDemo()` setup hook.
+ */
+const withAttributes = ( attributes ) => async ( page ) => {
+	await mockPromptApi()( page );
+	await page.route( '**/demos/ask-this-page/', async ( route ) => {
+		const response = await route.fetch();
+		const body = ( await response.text() ).replace( 'data-target="article"', attributes );
+		await route.fulfill( { response, body } );
+	} );
+};
+
 const ask = async ( page, question ) => {
 	await page.getByRole( 'button', { name: 'Ask this page' } ).click();
 	await page.getByRole( 'textbox', { name: 'Your question' } ).fill( question );
@@ -185,17 +200,22 @@ test( 'retries with less page text when it overflows the context window', async 
 } );
 
 test( 'falls back to the body text when data-target is not a valid selector', async () => {
-	const { page, close } = await openDemo( 'ask-this-page', {}, async ( page ) => {
-		await mockPromptApi()( page );
-		await page.route( '**/demos/ask-this-page/', async ( route ) => {
-			const response = await route.fetch();
-			const body = ( await response.text() ).replace( 'data-target="article"', 'data-target="[[bad"' );
-			await route.fulfill( { response, body } );
-		} );
-	} );
+	const { page, close } = await openDemo( 'ask-this-page', {}, withAttributes( 'data-target="[[bad"' ) );
 	await ask( page, 'When?' );
 	await answer( page, 'Widgets arrived in 2007.' ).waitFor();
 	const prompt = await page.evaluate( () => window.calls.create[ 0 ].initialPrompts[ 0 ].content );
 	assert.match( prompt, /Needs Chrome 148/ );
 	await close();
 } );
+
+for ( const position of [ 'bottom-left', 'top-right' ] ) {
+	test( `keeps the button in place when the panel opens at ${ position }`, async () => {
+		const { page, close } = await openDemo( 'ask-this-page', {}, withAttributes( `data-position="${ position }"` ) );
+		const toggle = page.getByRole( 'button', { name: 'Ask this page' } );
+		const before = await toggle.boundingBox();
+		await toggle.click();
+		await page.getByRole( 'dialog' ).waitFor();
+		assert.deepEqual( await toggle.boundingBox(), before );
+		await close();
+	} );
+}
