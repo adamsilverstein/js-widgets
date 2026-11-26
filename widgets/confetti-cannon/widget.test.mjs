@@ -104,3 +104,20 @@ test( 'does nothing with reduced motion', async () => {
 	assert.equal( await canvasCount( page ), 0 );
 	await close();
 } );
+
+test( 'a malformed selector throws once, and the event still fires', async () => {
+	const { page, errors, close } = await openDemo( 'confetti-cannon', {}, ( setup ) =>
+		setup.route( '**/demos/confetti-cannon/', async ( route ) => {
+			const response = await route.fetch();
+			const body = ( await response.text() ).replace( 'data-trigger=".celebrate"', 'data-trigger="[[bad"' );
+			await route.fulfill( { response, body } );
+		} )
+	);
+	await page.getByRole( 'button', { name: 'Celebrate' } ).click();
+	await page.locator( 'body' ).click();
+	assert.equal( errors.length, 1, 'one error, at load' );
+
+	await page.getByRole( 'button', { name: 'Subscribe' } ).click();
+	assert.equal( await canvasCount( page ), 1 );
+	await close();
+} );

@@ -105,7 +105,11 @@ function frame( now ) {
 	}
 }
 
+addEventListener( 'jsw:confetti', () => fire( innerWidth / 2, innerHeight ) );
+
 if ( trigger ) {
+	// A malformed selector throws here, once, instead of on every click on the page.
+	document.querySelector( trigger );
 	document.addEventListener( 'click', ( event ) => {
 		const element = event.target.closest?.( trigger );
 		if ( element ) {
@@ -115,5 +119,3 @@ if ( trigger ) {
 		}
 	} );
 }
-
-addEventListener( 'jsw:confetti', () => fire( innerWidth / 2, innerHeight ) );
