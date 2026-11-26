@@ -141,6 +141,11 @@ function noteOff( source ) {
 	}
 }
 
+/**
+ * Releases every note, or only those whose source starts with `prefix`.
+ *
+ * @param {string} [prefix] Source type: `p` pointer, `k` key, `m` MIDI.
+ */
 const stopAll = ( prefix = '' ) => {
 	for ( const source of [ ...voices.keys() ] ) {
 		if ( source.startsWith( prefix ) ) {
@@ -155,10 +160,11 @@ const noteAt = ( x, y ) => {
 	return el?.parentNode === keyboard ? Number( el.dataset.note ) : null;
 };
 const follow = ( event ) => {
-	const source = `p${ event.pointerId }`;
-	if ( event.type !== 'pointerdown' && ! voices.has( source ) && ! keyboard.hasPointerCapture( event.pointerId ) ) {
+	// Only a pointer pressed on the keyboard holds capture, so hovering plays nothing.
+	if ( ! keyboard.hasPointerCapture( event.pointerId ) ) {
 		return;
 	}
+	const source = `p${ event.pointerId }`;
 	const note = noteAt( event.clientX, event.clientY );
 	if ( note === null ) {
 		noteOff( source );

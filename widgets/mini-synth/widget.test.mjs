@@ -93,6 +93,9 @@ test( 'plays with the mouse and slides between keys', async () => {
 	const c = await box( 'C4' );
 	const e = await box( 'E4' );
 	await page.mouse.move( c.x + c.width / 2, c.y + c.height - 10 );
+	await page.mouse.move( e.x + e.width / 2, e.y + e.height - 10, { steps: 4 } );
+	await page.mouse.move( c.x + c.width / 2, c.y + c.height - 10, { steps: 4 } );
+	assert.deepEqual( await lit( page ), [], 'hovering plays nothing' );
 	await page.mouse.down();
 	assert.deepEqual( await lit( page ), [ 'C4' ] );
 	assert.equal( ( await stats( page ) ).contexts, 1 );
