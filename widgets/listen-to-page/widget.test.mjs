@@ -131,6 +131,19 @@ test( 'stops speaking when the visitor leaves the page', async () => {
 	await close();
 } );
 
+test( 'returns to the start after the last sentence', async () => {
+	const { page, close } = await open();
+	await page.getByRole( 'button', { name: 'Listen' } ).click();
+	await page.evaluate( () => {
+		while ( window.speech.current ) {
+			window.speech.finish();
+		}
+	} );
+	assert.ok( await page.getByRole( 'button', { name: 'Listen' } ).isVisible() );
+	assert.equal( await page.evaluate( () => CSS.highlights.has( 'jsw-listen' ) ), false );
+	await close();
+} );
+
 test( 'shows Resume when another script cancels speech', async () => {
 	const { page, close } = await open();
 	await page.getByRole( 'button', { name: 'Listen' } ).click();

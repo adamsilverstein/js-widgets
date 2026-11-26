@@ -136,7 +136,7 @@ ready( () => {
 	let list = [];
 	let current = 0;
 	let playing = false;
-	// Bumped on every new utterance, so a cancelled one cannot advance the reader.
+	// Bumped on every new utterance and on stop, so events from an earlier utterance are ignored.
 	let token = 0;
 	let rate = Math.min( 2, Math.max( 0.5, Number( config.rate ) || 1 ) );
 	if ( ! RATES.includes( rate ) ) {
@@ -196,11 +196,10 @@ ready( () => {
 	};
 
 	const reset = () => {
-		stop();
 		list = [];
 		current = 0;
 		CSS.highlights?.delete( HIGHLIGHT );
-		render();
+		stop();
 	};
 
 	/** Speaks sentence `index`, then the ones after it. */
