@@ -34,10 +34,9 @@ const CSS = `
 	.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(14em, 1fr)); gap: 10px; margin-bottom: 10px; }
 	.cols b { display: block; font-size: .85em; }
 	.cols p { margin: 4px 0 0; padding: 6px 8px; border-radius: 6px; white-space: pre-wrap; overflow-wrap: anywhere; background: color-mix(in srgb, CanvasText 6%, Canvas); }
-	.after { background: color-mix(in srgb, Highlight 18%, Canvas) !important; }
+	.cols .after { background: color-mix(in srgb, Highlight 18%, Canvas); }
 	.accept { font-weight: 600; }
 	@media (pointer: coarse) { button { min-block-size: 44px; } }
-	[hidden] { display: none !important; }
 `;
 
 ready( async () => {
