@@ -55,14 +55,37 @@ test( 'cards tilt independently', async () => {
 	await close();
 } );
 
-test( 'tilts slightly when keyboard focus moves into a card', async () => {
+test( 'tilts slightly for keyboard focus, and returns to it after the pointer leaves', async () => {
 	const { page, close } = await openDemo( 'tilt-card' );
-	await page.getByRole( 'button', { name: 'Claim' } ).focus();
+	const badge = page.locator( '.badge' );
+	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'Tab' );
 	await page.waitForTimeout( 600 );
-	assert.notEqual( await transformOf( page.locator( '.badge' ) ), '' );
-	await page.getByRole( 'button', { name: 'Claim' } ).blur();
+	const focused = await transformOf( badge );
+	assert.notEqual( focused, '' );
+
+	await pointAt( page, badge, 0.9, 0.9 );
+	assert.notEqual( await transformOf( badge ), focused );
+	await page.mouse.move( 2, 2 );
 	await page.waitForTimeout( 1500 );
-	assert.equal( await transformOf( page.locator( '.badge' ) ), '' );
+	assert.equal( await transformOf( badge ), focused, 'back to the focus tilt, not flat' );
+
+	await page.keyboard.press( 'Tab' );
+	await page.waitForTimeout( 1500 );
+	assert.equal( await transformOf( badge ), '' );
+	await close();
+} );
+
+test( 'a mouse click inside a card keeps following the pointer', async () => {
+	const { page, close } = await openDemo( 'tilt-card' );
+	const badge = page.locator( '.badge' );
+	const button = page.getByRole( 'button', { name: 'Claim' } );
+	// The button sits low in the card, so the pointer tilts the bottom edge away. The focus tilt is the opposite.
+	await pointAt( page, button, 0.5, 0.5 );
+	await page.mouse.down();
+	await page.mouse.up();
+	await page.waitForTimeout( 600 );
+	assert.match( await transformOf( badge ), /rotateX\(-/ );
 	await close();
 } );
 
@@ -91,6 +114,7 @@ test( 'follows device orientation on touch screens', async () => {
 	for ( const selector of [ '.profile', '.badge' ] ) {
 		assert.match( await transformOf( page.locator( selector ) ), /rotateY\((?!-)[\d.]+deg\)/ );
 	}
+
 	// Sensor noise on a phone lying still must not keep the animation running.
 	await page.evaluate( () => {
 		let i = 0;

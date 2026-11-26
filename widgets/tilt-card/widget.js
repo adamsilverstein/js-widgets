@@ -99,14 +99,12 @@ function enhance( el ) {
 		const y = ( ( event.clientY - rect.top ) / rect.height ) * 2 - 1;
 		tiltTo( Math.max( -1, Math.min( 1, x ) ), Math.max( -1, Math.min( 1, y ) ), true );
 	} );
-	el.addEventListener( 'pointerleave', () => tiltTo( 0, 0, el.matches( ':focus-within' ) ) );
-	// A gentle fixed tilt shows keyboard users which card has focus.
-	el.addEventListener( 'focusin', () => tiltTo( -0.3, -0.3, true ) );
-	el.addEventListener( 'focusout', ( event ) => {
-		if ( ! el.contains( event.relatedTarget ) ) {
-			tiltTo( 0, 0, false );
-		}
-	} );
+	// Keyboard focus gets a gentle fixed tilt. The pointer wins while it is over the card.
+	const rest = () =>
+		el.matches( ':focus-visible, :has(:focus-visible)' ) ? tiltTo( -0.3, -0.3, true ) : tiltTo( 0, 0, false );
+	el.addEventListener( 'pointerleave', rest );
+	el.addEventListener( 'focusin', () => el.matches( ':hover' ) || rest() );
+	el.addEventListener( 'focusout', () => el.matches( ':hover' ) || rest() );
 
 	return tiltTo;
 }
