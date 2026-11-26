@@ -38,7 +38,7 @@ test( 'renders two decorative eyes in a shadow root right after the snippet', as
 	assert.equal( info.eyes, 2 );
 	assert.equal( info.hidden, 'true' );
 	assert.equal( info.width, 64 );
-	// Only the demo's own <style>: the widget adds nothing to the page.
+	// The demo page's base styles and the demo's own: the widget adds none.
 	assert.equal( info.lightDomStyles, 2 );
 	assert.deepEqual( errors, [] );
 	await close();
@@ -91,6 +91,7 @@ test( 'goes wide for a moment on click', async () => {
 test( 'blinks and wanders when idle', async () => {
 	const { page, close } = await openDemo( 'googly-eyes', {}, withClock );
 	await page.clock.runFor( 13000 );
+	// Each blink animates both eyes.
 	assert.ok( ( await page.evaluate( () => window.blinks ) ) >= 4, 'blinked at least twice' );
 	const moved = ( await pupils( page ) ).some( ( [ x, y ] ) => x || y );
 	assert.ok( moved, 'pupils wandered with no input' );
