@@ -83,6 +83,8 @@ test( 'blinks on click', async () => {
 
 `openDemo( slug, contextOptions )` takes Playwright context options, eg. `{ reducedMotion: 'reduce' }` or `{ hasTouch: true }`. A third argument, `setup( page )`, runs before the page loads. Use it to mock what headless Chromium lacks or a test should not depend on: a built-in AI API with `page.addInitScript()`, or a network request with `page.route()`.
 
+Do not assume a built-in AI API is missing in headless Chromium: recent builds expose `LanguageModel`. A test for the unavailable case should delete the global in `page.addInitScript()`, and every other AI test should mock it.
+
 ## Publishing
 
 Merging to `main` runs the `Publish gallery` workflow. It builds the site, deploys it to GitHub Pages, and rewrites the widget list in the README. Do not edit that list by hand or in a pull request.

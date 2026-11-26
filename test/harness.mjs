@@ -10,17 +10,16 @@ import { serve } from '../scripts/serve.mjs';
 let started;
 
 const start = () =>
-	( started ??= Promise.all( [
+	( started ??= Promise.allSettled( [
 		chromium.launch(),
 		serve( fileURLToPath( new URL( '../site', import.meta.url ) ) ),
 	] ) );
 
+// Closes whichever of the two did start, so a failed launch cannot leave the server holding the process open.
 after( async () => {
-	if ( started ) {
-		const [ browser, server ] = await started;
-		await browser.close();
-		await server.close();
-	}
+	const [ browser, server ] = ( await started ) ?? [];
+	await browser?.value?.close();
+	await server?.value?.close();
 } );
 
 /**
@@ -35,7 +34,12 @@ after( async () => {
  *         The page, the uncaught errors it has thrown so far, and a function to close it.
  */
 export async function openDemo( slug, contextOptions = {}, setup ) {
-	const [ browser, server ] = await start();
+	const results = await start();
+	const failed = results.find( ( result ) => result.status === 'rejected' );
+	if ( failed ) {
+		throw failed.reason;
+	}
+	const [ browser, server ] = results.map( ( result ) => result.value );
 	const context = await browser.newContext( contextOptions );
 	const page = await context.newPage();
 	const errors = [];
