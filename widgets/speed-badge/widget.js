@@ -44,7 +44,11 @@ function render() {
 
 /**
  * Calls `fn` with every entry of `type`, including ones recorded before the
- * widget loaded. Browsers ignore a type they do not support.
+ * widget loaded, then re-renders. Browsers ignore a type they do not support.
+ *
+ * @param {string}   type    Performance entry type.
+ * @param {Function} fn      Called with each entry.
+ * @param {Object}   [extra] More `observe()` options, eg. `durationThreshold`.
  */
 function observe( type, fn, extra ) {
 	new PerformanceObserver( ( entries ) => {
