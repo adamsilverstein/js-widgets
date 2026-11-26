@@ -23,6 +23,9 @@ const LEVELS = {
 	expert: 'briefly, for a reader who knows the field',
 };
 
+// hasOwn keeps a level such as "constructor" from reading Object.prototype.
+const audience = Object.hasOwn( LEVELS, level ) ? LEVELS[ level ] : LEVELS.simple;
+
 const MODEL_OPTIONS = {
 	expectedInputs: [ { type: 'text', languages: [ 'en' ] } ],
 	expectedOutputs: [ { type: 'text', languages: [ 'en' ] } ],
@@ -179,7 +182,7 @@ ready( async () => {
 			} );
 			clone = await ( await session ).clone( { signal: controller.signal } );
 			const answer = await clone.prompt(
-				`Passage: """${ context }"""\n\nExplain "${ phrase }" ${ LEVELS[ level ] || LEVELS.simple }.`,
+				`Passage: """${ context }"""\n\nExplain "${ phrase }" ${ audience }.`,
 				{ signal: controller.signal }
 			);
 			// The model sometimes adds markdown emphasis despite the instructions.
