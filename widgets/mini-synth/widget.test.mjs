@@ -207,3 +207,16 @@ test( 'suspends the audio context once the last note has faded', async () => {
 	assert.equal( await state(), 'running', 'a held note keeps it running' );
 	await close();
 } );
+
+test( 'a repeated screen reader click plays its full note', async () => {
+	const { page, close } = await openDemo( 'mini-synth', {}, instrument );
+	const activate = () => page.getByRole( 'button', { name: 'C4', exact: true } ).evaluate( ( key ) => key.click() );
+	await activate();
+	await page.waitForTimeout( 300 );
+	await activate();
+	await page.waitForTimeout( 200 );
+	assert.deepEqual( await lit( page ), [ 'C4' ] );
+	await page.waitForFunction( () => window.__audio.playing === 0 );
+	assert.deepEqual( await lit( page ), [] );
+	await close();
+} );

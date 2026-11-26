@@ -208,10 +208,12 @@ keyboard.addEventListener( 'focusout', ( event ) => {
 } );
 
 // A click with no pointer or key behind it comes from assistive technology: play a short note.
+let tap;
 keyboard.addEventListener( 'click', ( event ) => {
 	if ( event.detail === 0 && event.target.dataset.note ) {
 		noteOn( 'a', Number( event.target.dataset.note ) );
-		setTimeout( () => noteOff( 'a' ), 400 );
+		clearTimeout( tap );
+		tap = setTimeout( () => noteOff( 'a' ), 400 );
 	}
 } );
 
