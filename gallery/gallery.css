@@ -1,239 +1,377 @@
 :root {
 	color-scheme: light dark;
-	--bg: light-dark(#f6f6f3, #131416);
-	--surface: light-dark(#fff, #1c1e21);
-	--text: light-dark(#1d1f23, #e8e8e6);
-	--muted: light-dark(#5d626b, #a2a7b0);
-	--border: light-dark(#dcdcd6, #2f3237);
-	--accent: light-dark(#2f5fd0, #8fb0ff);
-	--code: light-dark(#f0f0ec, #111214);
+	--paper: light-dark(#ffffff, #0f151e);
+	--wash: light-dark(#eef1f5, #161e2a);
+	--ink: light-dark(#16202e, #e9edf3);
+	--muted: light-dark(#5b6676, #9aa6b6);
+	--line: light-dark(#d5dae1, #2b3644);
+	--tag: light-dark(#2447d8, #9db4ff);
+	/* Highlighter yellow only ever means "selected" or "a value you can change". */
+	--mark: #ffe94a;
+	--on-mark: #16202e;
+	--sans: system-ui, sans-serif;
+	--mono: ui-monospace, Menlo, Consolas, monospace;
 }
 
 * {
 	box-sizing: border-box;
 }
 
-html {
-	scroll-behavior: smooth;
-	scroll-padding-top: 16px;
+[hidden] {
+	display: none !important;
 }
 
 body {
 	margin: 0;
-	background: var(--bg);
-	color: var(--text);
-	font: 16px/1.5 system-ui, sans-serif;
+	background: var(--paper);
+	color: var(--ink);
+	font: 400 17px/1.5 var(--sans);
 }
 
 a {
-	color: var(--accent);
+	color: var(--tag);
+	text-underline-offset: 3px;
 }
 
-.masthead {
-	max-width: 1280px;
-	margin: 0 auto;
-	padding: 40px 16px 8px;
+:focus-visible {
+	outline: 3px solid var(--tag);
+	outline-offset: 2px;
+	border-radius: 4px;
 }
 
-.masthead h1 {
+h1,
+h2,
+h3,
+p {
 	margin: 0;
-	font-size: 2.25rem;
-	letter-spacing: -0.02em;
 }
 
-.masthead p {
-	max-width: 60ch;
-	margin: 8px 0 0;
-	color: var(--muted);
+button {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 16px;
+	border: 1.5px solid var(--ink);
+	border-radius: 8px;
+	background: var(--paper);
+	color: var(--ink);
+	font: 600 1rem/1.2 var(--sans);
+	cursor: pointer;
 }
 
-.layout {
+button.primary {
+	background: var(--ink);
+	color: var(--paper);
+}
+
+button:hover {
+	box-shadow: 3px 3px 0 var(--mark);
+}
+
+button small {
+	font-weight: 400;
+	opacity: 0.75;
+}
+
+/* Layout: a rail listing every widget, and a stage showing one. */
+
+.app {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr);
-	gap: 24px;
-	max-width: 1280px;
-	margin: 0 auto;
-	padding: 16px;
+	grid-template-columns: 300px minmax(0, 1fr);
+	min-height: 100vh;
 }
 
-nav ul {
+.rail {
+	position: sticky;
+	top: 0;
+	align-self: start;
+	height: 100vh;
+	overflow: auto;
+	padding: 28px 16px 28px 28px;
+	background: var(--wash);
+}
+
+.rail h1 {
+	font: 800 1.9rem/1 var(--sans);
+	letter-spacing: -0.03em;
+}
+
+.rail h1 a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.rail .pitch {
+	margin: 10px 12px 22px 0;
+	color: var(--muted);
+	font-size: 0.95rem;
+	line-height: 1.4;
+}
+
+.rail h2 {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	margin: 20px 12px 6px 0;
+	font: 700 0.95rem/1.3 var(--sans);
+}
+
+.rail h2 small {
+	color: var(--muted);
+	font-weight: 400;
+	font-size: 0.8rem;
+}
+
+.rail ul {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-nav > ul {
+.rail li a {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 8px 16px;
-}
-
-nav > ul > li > a {
-	font-weight: 600;
-}
-
-/* On narrow screens the list is a row of category links only. */
-nav ul ul {
-	display: none;
-}
-
-nav a {
-	text-decoration: none;
-}
-
-nav a:hover {
-	text-decoration: underline;
-}
-
-@media (min-width: 900px) {
-	.layout {
-		grid-template-columns: 220px minmax(0, 1fr);
-		gap: 40px;
-	}
-
-	nav {
-		position: sticky;
-		top: 16px;
-		align-self: start;
-		max-height: calc(100vh - 32px);
-		overflow: auto;
-	}
-
-	nav > ul {
-		display: block;
-	}
-
-	nav > ul > li {
-		margin-bottom: 16px;
-	}
-
-	nav ul ul {
-		display: block;
-		margin-top: 4px;
-		font-size: 0.9rem;
-	}
-
-	nav ul ul a {
-		display: block;
-		padding: 2px 0;
-		color: var(--muted);
-	}
-}
-
-section {
-	margin-bottom: 48px;
-}
-
-h2 {
-	margin: 0;
-	font-size: 1.5rem;
-}
-
-.lede {
-	margin: 4px 0 16px;
-	color: var(--muted);
-}
-
-.cards {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
-	gap: 20px;
-}
-
-.card {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-	min-width: 0;
-	padding: 16px;
-	border: 1px solid var(--border);
-	border-radius: 12px;
-	background: var(--surface);
-}
-
-.card:target {
-	outline: 2px solid var(--accent);
-	outline-offset: 2px;
-}
-
-.card header {
-	display: flex;
-	align-items: baseline;
 	justify-content: space-between;
 	gap: 12px;
-}
-
-.card h3,
-.card p {
-	margin: 0;
-}
-
-.card h3 a {
-	color: inherit;
+	margin-left: -10px;
+	padding: 5px 12px 5px 10px;
+	border-radius: 6px;
+	color: var(--ink);
 	text-decoration: none;
 }
 
-.size {
+.rail li a span {
+	align-self: center;
 	color: var(--muted);
-	font-size: 0.85rem;
+	font-size: 0.82rem;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
 }
 
-.requires {
-	color: var(--muted);
-	font-size: 0.85rem;
+.rail li a:hover {
+	background: color-mix(in srgb, var(--ink) 8%, transparent);
 }
 
-iframe {
+.rail li a[aria-current] {
+	background: var(--mark);
+	color: var(--on-mark);
+	font-weight: 700;
+}
+
+.rail li a[aria-current] span {
+	color: var(--on-mark);
+}
+
+.rail .source {
+	display: block;
+	margin-top: 26px;
+	font-size: 0.9rem;
+}
+
+.stage {
+	display: grid;
+	gap: 22px;
+	align-content: start;
+	max-width: 1080px;
+	padding: 36px clamp(20px, 4vw, 56px) 56px;
+}
+
+.stage header {
+	display: grid;
+	gap: 10px;
+}
+
+.stage h2 {
+	font: 800 clamp(2.3rem, 1.4rem + 3.4vw, 4rem)/0.95 var(--sans);
+	letter-spacing: -0.035em;
+}
+
+.stage .description {
+	max-width: 58ch;
+	font-size: 1.2rem;
+	line-height: 1.4;
+}
+
+.facts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 22px;
+	color: var(--muted);
+	font-size: 0.95rem;
+}
+
+.facts b {
+	color: var(--ink);
+	font-variant-numeric: tabular-nums;
+}
+
+.requires {
+	max-width: 62ch;
+	padding: 10px 14px;
+	border-left: 4px solid var(--mark);
+	background: var(--wash);
+	font-size: 0.95rem;
+}
+
+/* The live demo. */
+
+.frame {
+	overflow: hidden;
+	border: 1.5px solid var(--ink);
+	border-radius: 12px;
+	background: var(--wash);
+}
+
+.frame .bar {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 8px 6px 14px;
+	border-bottom: 1.5px solid var(--ink);
+	background: var(--paper);
+	font-size: 0.9rem;
+}
+
+.frame .bar strong {
+	margin-right: auto;
+	font-weight: 600;
+}
+
+.frame .bar button {
+	padding: 5px 10px;
+	border-color: transparent;
+	border-radius: 6px;
+	font-weight: 500;
+	font-size: 0.9rem;
+	white-space: nowrap;
+}
+
+.frame .bar button[aria-pressed="true"] {
+	border-color: var(--ink);
+}
+
+/* Demos keep their own light page styling, so they read as someone else's site. */
+.frame iframe {
+	display: block;
 	width: 100%;
-	border: 1px solid var(--border);
-	border-radius: 8px;
+	margin: 0 auto;
+	border: 0;
 	background: #fff;
 	color-scheme: light;
 }
 
-pre {
+.frame.phone iframe {
+	width: 390px;
+	max-width: 100%;
+	border-inline: 1.5px solid var(--ink);
+}
+
+/* The snippet, with its option values editable in place. */
+
+.tune {
+	display: grid;
+	gap: 12px;
+}
+
+.tune h3 {
+	font: 700 1.05rem/1.3 var(--sans);
+}
+
+.tune h3 span {
+	color: var(--muted);
+	font-weight: 400;
+}
+
+.snippet {
 	margin: 0;
-	padding: 12px;
+	padding: 20px 22px;
 	overflow-x: auto;
-	border-radius: 8px;
-	background: var(--code);
-	font: 0.8rem/1.5 ui-monospace, monospace;
+	border-radius: 10px;
+	background: var(--wash);
+	font: 500 clamp(0.85rem, 0.7rem + 0.5vw, 1.05rem)/1.9 var(--mono);
+	white-space: pre;
+}
+
+.snippet .url {
+	color: var(--muted);
+}
+
+.snippet .name {
+	color: var(--tag);
+}
+
+.snippet input.value {
+	min-width: 2ch;
+	max-width: 46ch;
+	padding: 2px 5px;
+	border: 0;
+	border-radius: 3px;
+	outline-offset: 1px;
+	background: var(--mark);
+	color: var(--on-mark);
+	font: inherit;
+	field-sizing: content;
+}
+
+.snippet input[type="color"] {
+	width: 1.3em;
+	height: 1.3em;
+	margin-right: 6px;
+	padding: 0;
+	border: 1.5px solid var(--ink);
+	border-radius: 50%;
+	background: none;
+	vertical-align: -0.25em;
+	cursor: pointer;
+}
+
+.snippet input[type="color"]::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+.snippet input[type="color"]::-webkit-color-swatch {
+	border: 0;
+	border-radius: 50%;
 }
 
 .actions {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 8px;
+	gap: 10px;
 }
 
-button {
-	padding: 6px 12px;
-	border: 1px solid var(--border);
-	border-radius: 6px;
-	background: var(--surface);
-	color: inherit;
-	font: inherit;
-	font-size: 0.9rem;
-	cursor: pointer;
-}
-
-button:hover {
-	border-color: var(--accent);
-}
-
-button:first-child {
-	border-color: var(--accent);
-	background: var(--accent);
-	color: var(--surface);
-}
-
-.links {
+.actions .links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 18px;
 	margin-left: auto;
+	font-size: 0.95rem;
+}
+
+.pager {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 18px;
+	padding-top: 22px;
+	border-top: 1.5px solid var(--line);
+}
+
+.pager a {
+	color: var(--ink);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.pager a small {
+	display: block;
 	color: var(--muted);
-	font-size: 0.85rem;
+	font-weight: 400;
+}
+
+.pager a:last-child {
+	margin-left: auto;
+	text-align: right;
 }
 
 /* Announces copies to screen readers. The button label is the visible feedback. */
@@ -245,8 +383,72 @@ button:first-child {
 	clip-path: inset(50%);
 }
 
-@media (prefers-reduced-motion: reduce) {
-	html {
-		scroll-behavior: auto;
+/* Narrow screens: the rail becomes a strip of chips that scrolls sideways. */
+@media (max-width: 860px) {
+	.app {
+		display: block;
+	}
+
+	.rail {
+		position: static;
+		height: auto;
+		padding: 18px 0 12px 18px;
+	}
+
+	.rail .pitch {
+		margin-bottom: 12px;
+	}
+
+	.rail nav {
+		display: flex;
+		gap: 22px;
+		overflow-x: auto;
+		padding: 0 18px 8px 0;
+		scroll-snap-type: x proximity;
+	}
+
+	.rail section {
+		flex: none;
+		scroll-snap-align: start;
+	}
+
+	.rail h2 {
+		position: sticky;
+		left: 0;
+		gap: 10px;
+		width: max-content;
+		margin-top: 4px;
+	}
+
+	.rail ul {
+		display: flex;
+		gap: 6px;
+	}
+
+	.rail li a {
+		margin: 0;
+		border: 1.5px solid var(--line);
+		white-space: nowrap;
+	}
+
+	.rail li a span,
+	.rail .source,
+	.frame .bar [data-do="phone"] {
+		display: none;
+	}
+
+	.stage {
+		padding-top: 24px;
+	}
+
+	.actions .links {
+		width: 100%;
+		margin-left: 0;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	button {
+		transition: box-shadow 0.12s;
 	}
 }
