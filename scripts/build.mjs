@@ -4,6 +4,7 @@
  *   site/<file>.min.js          Minified widget, the file users copy or link to.
  *   site/demos/<slug>/          Live demo page, shown in an iframe by the gallery.
  *   site/index.html             The gallery.
+ *   site/posters/<slug>.png     Screenshots for the README, added by `scripts/posters.mjs`.
  *   site/widgets.json           Manifest, read by the tests.
  *
  * Flags:
@@ -129,8 +130,9 @@ async function buildWidget( widget ) {
  *
  * @param {Object} widget  Widget metadata.
  * @param {string} article Sample article that replaces `<!-- demo:article -->`.
+ * @param {string} options Script tag that applies option overrides, added to `<head>`.
  */
-async function buildDemo( widget, article ) {
+async function buildDemo( widget, article, options ) {
 	const out = path.join( SITE, 'demos', widget.slug );
 	await mkdir( out, { recursive: true } );
 
@@ -147,6 +149,7 @@ async function buildDemo( widget, article ) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${ escapeHtml( widget.name ) } demo</title>
+${ options }
 <style>${ await readFile( path.join( ROOT, 'gallery/demo.css' ), 'utf8' ) }</style>
 </head>
 <body>
@@ -154,6 +157,8 @@ ${ html }
 </body>
 </html>
 `;
+	} else {
+		html = html.replace( /<head[^>]*>/i, ( head ) => `${ head }\n${ options }` );
 	}
 	await writeFile( path.join( out, 'index.html' ), html );
 
@@ -167,77 +172,56 @@ ${ html }
 const hostedSnippet = ( widget ) =>
 	widget.snippet.replace( ` src="${ widget.file }.min.js"`, ` src="${ SITE_URL }${ widget.file }.min.js"` );
 
-/** The snippet with the minified code inline, so the paste makes no extra request. */
-const inlineSnippet = ( widget ) =>
-	widget.snippet
-		.replace( ` src="${ widget.file }.min.js"`, '' )
-		// A replacer function, so "$" sequences in the code are not read as patterns.
-		.replace( /><\/script>$/, () => `>${ widget.code }</script>` );
+/**
+ * The snippet's options, which the gallery shows as editable values.
+ *
+ * @param {Object} widget Widget metadata.
+ * @return {{name: string, value: string}[]} Every attribute of the script tag except `src`.
+ */
+const snippetAttributes = ( widget ) =>
+	[ ...widget.snippet.matchAll( /\s([\w-]+)="([^"]*)"/g ) ]
+		.map( ( [ , name, value ] ) => ( { name, value } ) )
+		.filter( ( { name } ) => name !== 'src' );
 
-function renderCard( widget ) {
-	const links = [
-		`<a href="demos/${ widget.slug }/">Open demo</a>`,
-		`<a href="${ REPO_URL }/tree/main/widgets/${ widget.slug }">Docs and source</a>`,
-		widget.issue && `<a href="${ REPO_URL }/issues/${ widget.issue }">Issue #${ widget.issue }</a>`,
-	].filter( Boolean );
-
-	return `<article class="card" id="${ widget.slug }">
-	<header>
-		<h3><a href="#${ widget.slug }">${ escapeHtml( widget.name ) }</a></h3>
-		<span class="size" title="${ widget.bytes } bytes minified, ${ widget.gzipBytes } gzipped">${ formatSize( widget.bytes ) }</span>
-	</header>
-	<p>${ escapeHtml( widget.description ) }</p>
-	${ widget.requires ? `<p class="requires">Requires ${ escapeHtml( widget.requires ) }.</p>` : '' }
-	<iframe src="demos/${ widget.slug }/" title="${ escapeHtml( widget.name ) } live demo" loading="lazy" style="height:${ Number( widget.demoHeight ) || 280 }px" allow="geolocation; midi; accelerometer; gyroscope; autoplay; clipboard-write"></iframe>
-	<pre><code>${ escapeHtml( hostedSnippet( widget ) ) }</code></pre>
-	<div class="actions">
-		<button type="button" data-copy="snippet" data-widget="${ widget.slug }">Copy snippet</button>
-		<button type="button" data-copy="inline" data-widget="${ widget.slug }" title="The whole widget in one script tag, with nothing loaded from another server">Copy inline JS</button>
-		<span class="links">${ links.join( ' · ' ) }</span>
-	</div>
-</article>`;
-}
-
-async function buildGallery( widgets ) {
-	const sections = Object.entries( CATEGORIES )
+/** Widgets grouped by category, in the order the gallery and the README list them. */
+const groupByCategory = ( widgets ) =>
+	Object.entries( CATEGORIES )
 		.map( ( [ id, category ] ) => ( { id, ...category, widgets: widgets.filter( ( widget ) => widget.category === id ) } ) )
 		.filter( ( section ) => section.widgets.length );
 
+async function buildGallery( widgets ) {
+	const sections = groupByCategory( widgets );
+
 	const nav = sections
 		.map(
-			( section ) => `<li><a href="#${ section.id }">${ escapeHtml( section.title ) }</a>
-			<ul>${ section.widgets.map( ( widget ) => `<li><a href="#${ widget.slug }">${ escapeHtml( widget.name ) }</a></li>` ).join( '' ) }</ul></li>`
-		)
-		.join( '\n' );
-
-	const main = sections
-		.map(
-			( section ) => `<section id="${ section.id }">
-	<h2>${ escapeHtml( section.title ) }</h2>
-	<p class="lede">${ escapeHtml( section.description ) }</p>
-	<div class="cards">
-${ section.widgets.map( renderCard ).join( '\n' ) }
-	</div>
+			( section ) => `<section>
+	<h2>${ escapeHtml( section.title ) }${ section.id === 'ai' ? ' <small>Chrome desktop</small>' : '' }</h2>
+	<ul>${ section.widgets
+		.map( ( widget ) => `<li><a href="#${ widget.slug }">${ escapeHtml( widget.name ) } <span>${ formatSize( widget.bytes ) }</span></a></li>` )
+		.join( '' ) }</ul>
 </section>`
 		)
 		.join( '\n' );
 
-	// What the copy buttons write to the clipboard, keyed by widget slug.
-	const snippets = Object.fromEntries(
-		widgets.map( ( widget ) => [ widget.slug, { snippet: hostedSnippet( widget ), inline: inlineSnippet( widget ) } ] )
-	);
+	// In rail order, so Previous and Next follow it. The code itself is fetched on demand.
+	const data = {
+		siteUrl: SITE_URL,
+		repoUrl: REPO_URL,
+		widgets: sections
+			.flatMap( ( section ) => section.widgets )
+			.map( ( { code, source, snippet, ...widget } ) => ( { ...widget, attrs: snippetAttributes( { snippet } ) } ) ),
+	};
 
 	const read = ( file ) => readFile( path.join( ROOT, 'gallery', file ), 'utf8' );
 	const parts = {
 		style: `<style>${ await read( 'gallery.css' ) }</style>`,
 		nav,
-		main: main || '<p>No widgets yet.</p>',
-		count: `${ widgets.length } standalone JavaScript widget${ widgets.length === 1 ? '' : 's' }`,
-		// "<" is escaped so widget code cannot close the JSON script element early.
-		script: `<script type="application/json" id="snippets">${ JSON.stringify( snippets ).replaceAll( '<', '\\u003c' ) }</script>
+		count: `${ widgets.length } small script${ widgets.length === 1 ? '' : 's' }`,
+		// "<" is escaped so a description cannot close the JSON script element early.
+		script: `<script type="application/json" id="widgets">${ JSON.stringify( data ).replaceAll( '<', '\\u003c' ) }</script>
 <script>${ await read( 'gallery.js' ) }</script>`,
 	};
-	// A replacer function, so "$" sequences in widget code are not read as patterns.
+	// A replacer function, so "$" sequences in the script are not read as patterns.
 	const html = ( await read( 'index.html' ) ).replace( /<!-- gallery:(\w+) -->/g, ( match, part ) => parts[ part ] ?? match );
 	await writeFile( path.join( SITE, 'index.html' ), html );
 }
@@ -246,24 +230,38 @@ ${ section.widgets.map( renderCard ).join( '\n' ) }
  * Rewrites the widget list between the `widgets:start` and `widgets:end`
  * markers in README.md. CI runs this on `main`, so pull requests never touch
  * the list and cannot conflict over it.
+ *
+ * A README cannot run JavaScript, so each widget is a poster (a screenshot
+ * published with the gallery, see `scripts/posters.mjs`) linking to its live
+ * demo, and the snippets are code blocks, which GitHub gives a copy button.
  */
 async function updateReadme( widgets ) {
 	const file = path.join( ROOT, 'README.md' );
 	const readme = await readFile( file, 'utf8' );
+	const perRow = 3;
 
-	const list = Object.entries( CATEGORIES )
-		.map( ( [ id, category ] ) => {
-			const rows = widgets
-				.filter( ( widget ) => widget.category === id )
-				.map(
-					( widget ) =>
-						`| [${ widget.name }](widgets/${ widget.slug }) | ${ widget.description.replaceAll( '|', '\\|' ) } | ${ formatSize( widget.bytes ) } | [Live demo](${ SITE_URL }#${ widget.slug }) |`
-				);
-			return rows.length
-				? `### ${ category.title }\n\n${ category.description }\n\n| Widget | What it does | Size | Try it |\n| --- | --- | --- | --- |\n${ rows.join( '\n' ) }`
-				: '';
+	const list = groupByCategory( widgets )
+		.map( ( section ) => {
+			const cells = section.widgets.map(
+				( widget ) => `<td width="33%" valign="top">
+<a href="${ SITE_URL }#${ widget.slug }"><img src="${ SITE_URL }posters/${ widget.slug }.png" alt="${ escapeHtml( widget.name ) } demo" width="100%"></a><br>
+<b><a href="widgets/${ widget.slug }">${ escapeHtml( widget.name ) }</a></b> <sub>${ formatSize( widget.bytes ) }</sub><br>
+<sub>${ escapeHtml( widget.description ) }</sub>
+</td>`
+			);
+			const rows = [];
+			for ( let i = 0; i < cells.length; i += perRow ) {
+				rows.push( `<tr>\n${ cells.slice( i, i + perRow ).join( '\n' ) }\n</tr>` );
+			}
+			const snippets = section.widgets
+				.map( ( widget ) => `**${ widget.name }** &nbsp; [options](widgets/${ widget.slug }#options)\n\n\`\`\`html\n${ hostedSnippet( widget ) }\n\`\`\`` )
+				.join( '\n\n' );
+			const note =
+				section.id === 'ai'
+					? '> [!NOTE]\n> These use Chrome\'s built-in AI, so they need a recent desktop Chrome. In other browsers they render nothing and the page works as before.\n\n'
+					: '';
+			return `### ${ section.title }\n\n${ section.description }\n\n${ note }<table>\n${ rows.join( '\n' ) }\n</table>\n\n<details>\n<summary>Copy a snippet</summary>\n\n${ snippets }\n\n</details>`;
 		} )
-		.filter( Boolean )
 		.join( '\n\n' );
 
 	const updated = readme.replace(
@@ -291,11 +289,12 @@ async function all( jobs ) {
 export async function buildAll( { readme = false, template = false } = {} ) {
 	const widgets = await loadWidgets( template );
 	const article = await readFile( path.join( ROOT, 'gallery/demo-article.html' ), 'utf8' );
+	const options = `<script>${ await readFile( path.join( ROOT, 'gallery/demo-options.js' ), 'utf8' ) }</script>`;
 
 	await rm( SITE, { recursive: true, force: true } );
 	await mkdir( SITE, { recursive: true } );
 	await all( widgets.map( buildWidget ) );
-	await all( widgets.map( ( widget ) => buildDemo( widget, article ) ) );
+	await all( widgets.map( ( widget ) => buildDemo( widget, article, options ) ) );
 	await buildGallery( widgets );
 	await writeFile(
 		path.join( SITE, 'widgets.json' ),

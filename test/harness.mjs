@@ -23,9 +23,9 @@ after( async () => {
 } );
 
 /**
- * Opens a widget's built demo page. Run `npm run build` first (`npm test` does).
+ * Opens a page of the built site. Run `npm run build` first (`npm test` does).
  *
- * @param {string}   slug             Widget directory name.
+ * @param {string}   target           Path within `site/`, eg. `demos/googly-eyes/` or `#googly-eyes`.
  * @param {Object}   [contextOptions] Playwright context options, eg. `{ reducedMotion: 'reduce' }`.
  * @param {Function} [setup]          Called with the page before it navigates, eg. to mock a
  *                                    browser API with `page.addInitScript()` or a request with
@@ -33,7 +33,7 @@ after( async () => {
  * @return {Promise<{page: import('playwright').Page, errors: Error[], close: Function}>}
  *         The page, the uncaught errors it has thrown so far, and a function to close it.
  */
-export async function openDemo( slug, contextOptions = {}, setup ) {
+export async function openPage( target, contextOptions = {}, setup ) {
 	const results = await start();
 	const failed = results.find( ( result ) => result.status === 'rejected' );
 	if ( failed ) {
@@ -45,6 +45,16 @@ export async function openDemo( slug, contextOptions = {}, setup ) {
 	const errors = [];
 	page.on( 'pageerror', ( error ) => errors.push( error ) );
 	await setup?.( page );
-	await page.goto( `${ server.url }demos/${ slug }/` );
+	await page.goto( server.url + target );
 	return { page, errors, close: () => context.close() };
 }
+
+/**
+ * Opens a widget's built demo page. Takes the same options as `openPage()`.
+ *
+ * @param {string}   slug             Widget directory name.
+ * @param {Object}   [contextOptions] Playwright context options.
+ * @param {Function} [setup]          Called with the page before it navigates.
+ * @return {ReturnType<typeof openPage>} The page, its errors and a function to close it.
+ */
+export const openDemo = ( slug, contextOptions, setup ) => openPage( `demos/${ slug }/`, contextOptions, setup );
