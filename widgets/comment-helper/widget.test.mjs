@@ -22,7 +22,10 @@ const mockApi = ( state = 'available' ) => ( page ) =>
 			destroy() {}
 		}
 		window.LanguageModel = {
-			availability: async () => state,
+			async availability( options ) {
+				window.__languages = options.expectedInputs[ 0 ].languages;
+				return state;
+			},
 			async create( options ) {
 				window.__createOptions = options;
 				options.monitor?.( { addEventListener: ( type, listener ) => listener( { loaded: 0.5 } ) } );
@@ -158,4 +161,21 @@ test( 'shows download progress, and sends nothing over the network', async () =>
 	assert.equal( await page.evaluate( () => window.__prompts.length ), 1 );
 	assert.deepEqual( requests, [] );
 	await close();
+} );
+
+test( 'asks for the primary language subtag of the page', async () => {
+	for ( const [ lang, expected ] of [ [ 'es-MX', 'es' ], [ 'jam', 'jam' ] ] ) {
+		const { page, close } = await openDemo( 'comment-helper', {}, async ( page ) => {
+			await mockApi()( page );
+			// Serve the demo with a different <html lang>.
+			await page.route( '**/demos/comment-helper/', async ( route ) => {
+				const response = await route.fetch();
+				const body = ( await response.text() ).replace( 'lang="en"', `lang="${ lang }"` );
+				await route.fulfill( { response, body } );
+			} );
+		} );
+		await page.getByRole( 'button', { name: 'Fix grammar' } ).waitFor();
+		assert.deepEqual( await page.evaluate( () => window.__languages ), [ expected ] );
+		await close();
+	}
 } );

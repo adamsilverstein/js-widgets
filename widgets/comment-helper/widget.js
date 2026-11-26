@@ -46,7 +46,7 @@ ready( async () => {
 		return;
 	}
 	// availability() reports "unavailable" for a language the model does not support, so no toolbar appears.
-	const lang = ( document.documentElement.lang || 'en' ).slice( 0, 2 );
+	const lang = ( document.documentElement.lang || 'en' ).split( /[-_]/ )[ 0 ];
 	const io = {
 		expectedInputs: [ { type: 'text', languages: [ lang ] } ],
 		expectedOutputs: [ { type: 'text', languages: [ lang ] } ],
