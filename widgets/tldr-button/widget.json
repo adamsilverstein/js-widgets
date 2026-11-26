@@ -1,0 +1,10 @@
+{
+	"name": "TL;DR Button",
+	"description": "A button that summarizes the article into three key points, generated on the visitor's device with no server or API key.",
+	"category": "ai",
+	"file": "tldr",
+	"issue": 11,
+	"snippet": "<script src=\"tldr.min.js\" data-target=\"article\" data-type=\"key-points\" data-length=\"short\"></script>",
+	"demoHeight": 440,
+	"requires": "Chrome 138 or later on desktop, with the built-in Summarizer model"
+}
