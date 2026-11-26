@@ -14,6 +14,7 @@ const instrument = ( page ) =>
 			constructor( ...args ) {
 				super( ...args );
 				stats.contexts++;
+				window.__context = this;
 			}
 		};
 		const { start, stop } = OscillatorNode.prototype;
@@ -188,5 +189,21 @@ test( 'several synths share one MIDI controller', async () => {
 	await page.getByRole( 'button', { name: 'MIDI on' } ).first().click();
 	await page.evaluate( () => window.__midi.send( [ 0x90, 64, 100 ] ) );
 	assert.deepEqual( await both(), [ 0, 1 ] );
+	await close();
+} );
+
+test( 'suspends the audio context once the last note has faded', async () => {
+	const { page, close } = await openDemo( 'mini-synth', {}, instrument );
+	const state = () => page.evaluate( () => window.__context.state );
+	await page.getByRole( 'button', { name: 'C4', exact: true } ).click();
+	assert.equal( await state(), 'running' );
+	await page.waitForFunction( () => window.__context.state === 'suspended', null, { timeout: 3000 } );
+
+	// The next note wakes it up again.
+	await page.getByRole( 'button', { name: 'D4', exact: true } ).focus();
+	await page.keyboard.down( 'KeyZ' );
+	await page.waitForFunction( () => window.__context.state === 'running' );
+	await page.waitForTimeout( 1500 );
+	assert.equal( await state(), 'running', 'a held note keeps it running' );
 	await close();
 } );

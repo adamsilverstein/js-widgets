@@ -84,7 +84,7 @@ for ( let note = low; note <= high; note++ ) {
 }
 keyboard.style.gridTemplateColumns = `repeat(${ whites * 4 },1fr)`;
 
-let ctx, master;
+let ctx, master, idle;
 /** Sounding notes, keyed by what holds them: a pointer, a computer key or a MIDI note. */
 const voices = new Map();
 
@@ -106,6 +106,7 @@ function noteOn( source, note ) {
 		master = new GainNode( ctx, { gain: volume } );
 		master.connect( ctx.destination );
 	}
+	clearTimeout( idle );
 	ctx.resume();
 	const t = ctx.currentTime;
 	const osc = new OscillatorNode( ctx, { type: wave, frequency: 440 * 2 ** ( ( note - 69 ) / 12 ) } );
@@ -134,6 +135,10 @@ function noteOff( source ) {
 	voice.gain.gain.setTargetAtTime( 0, t, 0.04 );
 	voice.osc.stop( t + 0.3 );
 	light( voice.note );
+	// A running context keeps the audio thread busy, so suspend it once the last note has faded.
+	if ( ! voices.size ) {
+		idle = setTimeout( () => ctx.suspend(), 1000 );
+	}
 }
 
 const stopAll = ( prefix = '' ) => {
