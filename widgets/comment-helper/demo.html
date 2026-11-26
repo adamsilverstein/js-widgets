@@ -1,0 +1,22 @@
+<style>
+	label { display: block; font-weight: 600; margin-bottom: 4px; }
+	textarea { box-sizing: border-box; width: 100%; font: inherit; padding: 8px; }
+	output { display: block; margin-top: 8px; white-space: pre-wrap; }
+</style>
+<p class="demo-note">Needs Chrome 148 or later on a desktop that can run the built-in Prompt API model. Elsewhere the form works as usual, with no buttons.</p>
+
+<form id="comment-form">
+	<label for="comment">Leave a comment</label>
+	<textarea id="comment" name="comment" rows="3">i realy liked this post, it explain the topic good and i will defintely try it on my own site tomorow</textarea>
+	<button>Post comment</button>
+	<output for="comment"></output>
+</form>
+
+<script>
+	// Demo only: show what the form would send instead of leaving the page.
+	document.getElementById( 'comment-form' ).addEventListener( 'submit', ( event ) => {
+		event.preventDefault();
+		event.target.querySelector( 'output' ).textContent = 'Posted: ' + new FormData( event.target ).get( 'comment' );
+	} );
+</script>
+<script src="write.min.js" data-target="#comment, .contact-form textarea"></script>

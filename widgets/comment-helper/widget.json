@@ -1,0 +1,10 @@
+{
+	"name": "Comment Helper",
+	"description": "Adds Fix grammar, Friendlier and Shorter buttons under a textarea, with suggestions written on the visitor's device.",
+	"category": "ai",
+	"file": "write",
+	"issue": 20,
+	"snippet": "<script src=\"write.min.js\" data-target=\"#comment, .contact-form textarea\"></script>",
+	"demoHeight": 480,
+	"requires": "Chrome 148 or later on desktop"
+}
