@@ -1,0 +1,9 @@
+{
+	"name": "ASCII Cinema",
+	"description": "Plays a video as live ASCII art, with a click to switch back to the real picture.",
+	"category": "fun",
+	"file": "ascii",
+	"issue": 4,
+	"snippet": "<script src=\"ascii.min.js\" data-src=\"clip.mp4\" data-cols=\"100\" data-color=\"#33ff66\"></script>",
+	"demoHeight": 350
+}
