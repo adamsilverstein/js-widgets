@@ -1,0 +1,10 @@
+{
+	"name": "Explain This",
+	"description": "Select a word or phrase to get a short, plain language explanation that fits the paragraph it sits in.",
+	"category": "ai",
+	"file": "explain",
+	"issue": 18,
+	"snippet": "<script src=\"explain.min.js\" data-target=\"article\" data-level=\"simple\"></script>",
+	"demoHeight": 420,
+	"requires": "Chrome 148 or later on desktop, with the built-in Prompt API"
+}
