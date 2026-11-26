@@ -275,14 +275,27 @@ async function updateReadme( widgets ) {
 	}
 }
 
+/**
+ * Like `Promise.all`, but waits for every job before failing. A rebuild that
+ * starts right after a failure would otherwise race the jobs still writing.
+ *
+ * @param {Promise[]} jobs Jobs to wait for.
+ */
+async function all( jobs ) {
+	const failed = ( await Promise.allSettled( jobs ) ).find( ( job ) => job.status === 'rejected' );
+	if ( failed ) {
+		throw failed.reason;
+	}
+}
+
 export async function buildAll( { readme = false, template = false } = {} ) {
 	const widgets = await loadWidgets( template );
 	const article = await readFile( path.join( ROOT, 'gallery/demo-article.html' ), 'utf8' );
 
 	await rm( SITE, { recursive: true, force: true } );
 	await mkdir( SITE, { recursive: true } );
-	await Promise.all( widgets.map( buildWidget ) );
-	await Promise.all( widgets.map( ( widget ) => buildDemo( widget, article ) ) );
+	await all( widgets.map( buildWidget ) );
+	await all( widgets.map( ( widget ) => buildDemo( widget, article ) ) );
 	await buildGallery( widgets );
 	await writeFile(
 		path.join( SITE, 'widgets.json' ),
