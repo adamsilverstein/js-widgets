@@ -183,3 +183,19 @@ test( 'retries with less page text when it overflows the context window', async 
 	assert.ok( sizes[ 0 ] > 1000 && sizes[ 1 ] <= 1000, `prompt sizes ${ sizes }` );
 	await close();
 } );
+
+test( 'falls back to the body text when data-target is not a valid selector', async () => {
+	const { page, close } = await openDemo( 'ask-this-page', {}, async ( page ) => {
+		await mockPromptApi()( page );
+		await page.route( '**/demos/ask-this-page/', async ( route ) => {
+			const response = await route.fetch();
+			const body = ( await response.text() ).replace( 'data-target="article"', 'data-target="[[bad"' );
+			await route.fulfill( { response, body } );
+		} );
+	} );
+	await ask( page, 'When?' );
+	await answer( page, 'Widgets arrived in 2007.' ).waitFor();
+	const prompt = await page.evaluate( () => window.calls.create[ 0 ].initialPrompts[ 0 ].content );
+	assert.match( prompt, /Needs Chrome 148/ );
+	await close();
+} );

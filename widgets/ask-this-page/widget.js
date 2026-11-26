@@ -74,7 +74,13 @@ const HTML = `
  * @return {string} Instructions followed by the truncated page text.
  */
 function systemPrompt( scale = 1 ) {
-	const content = document.querySelector( target ) || document.body;
+	let content;
+	try {
+		content = document.querySelector( target );
+	} catch {
+		// An invalid selector falls back to <body>, as a missing element does.
+	}
+	content ||= document.body;
 	const text = content.innerText.replace( /\n{3,}/g, '\n\n' ).trim();
 	return `You answer a visitor's questions about one web page, using only the page text below. Answer briefly, in plain text. Do not use outside knowledge. If the page text does not contain the answer, reply exactly: "${ NOT_COVERED }"
 
