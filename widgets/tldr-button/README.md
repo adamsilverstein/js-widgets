@@ -12,15 +12,17 @@ Adds a "TL;DR" button to the top of an article. A click shows a short summary th
 | --- | --- | --- |
 | `data-target` | `article` | CSS selector for the article to summarize. The first match is used. |
 | `data-type` | `key-points` | `key-points` (a bulleted list), `tldr`, `teaser` or `headline`. |
-| `data-length` | `short` | `short`, `medium` or `long`. For `key-points` that is at most 3, 5 or 7 points. |
+| `data-length` | `short` | `short`, `medium` or `long`. For `key-points` that is 3, 5 or 7 points. |
+
+An unknown `data-type` or `data-length` makes `availability()` fail, and the button does not appear.
 
 The button goes right after the article's heading when the article starts with an `h1` to `h3`, and at the very top otherwise.
 
 ## Notes
 
-- **Browser support.** The button only appears where `Summarizer.availability()` says the API can be used: Chrome 138 or later on Windows, macOS, Linux or ChromeOS on Chromebook Plus, on hardware that can run the model. Not on Android, iOS, Firefox or Safari. Everywhere else the widget renders nothing and the page is unchanged.
+- **Browser support.** The button only appears where `Summarizer.availability()` says the API can be used: Chrome 138 or later on Windows 10 or 11, macOS 13 or later, Linux, or ChromeOS on a Chromebook Plus, with more than 4 GB of GPU memory or 16 GB of RAM and 4 CPU cores. Not on Android, iOS, Firefox or Safari. Everywhere else the widget renders nothing and the page is unchanged.
 - **Languages.** The summary language follows the nearest `lang` attribute (English, Spanish, Japanese, German and French are supported today). On a page in another language the button does not appear.
-- **First use downloads a model.** Nothing runs until the visitor clicks. If the model is not on the device yet, the click starts a one-time download of a few gigabytes, managed by Chrome, with a progress bar and a Cancel button.
+- **First use downloads a model.** Nothing runs until the visitor clicks. If the model is not on the device yet, the click starts a one-time download, managed by Chrome, with a progress bar and a Cancel button. Chrome needs at least 22 GB of free disk space and an unmetered connection for it.
 - **Long articles** are cut to fit the model's input limit, and the label then says the summary covers the first part of the article.
 - **Accessibility.** The button is a disclosure toggle with `aria-expanded`. The summary is labelled as machine generated, and announced to screen readers once complete rather than chunk by chunk.
 - **Network.** The widget makes no network requests itself. Chrome fetches the model.

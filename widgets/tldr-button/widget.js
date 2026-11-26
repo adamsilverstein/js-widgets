@@ -21,7 +21,7 @@ ready( async () => {
 	if ( ! article ) {
 		return;
 	}
-	// The model supports a handful of languages, so an unsupported page language makes availability() fail.
+	// availability() reports "unavailable" for a language the model does not support, so the button stays hidden.
 	const lang = ( article.closest( '[lang]' )?.lang || 'en' ).slice( 0, 2 );
 	const config = {
 		type,
