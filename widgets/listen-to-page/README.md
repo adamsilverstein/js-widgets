@@ -16,7 +16,7 @@ Adds a small player above an article that reads it aloud with the browser's own 
 
 ## Controls
 
-- **Listen / Pause / Resume** starts, pauses and continues reading.
+- **Listen / Pause / Resume** starts and pauses reading. Resume starts the paused sentence again from its beginning.
 - **Previous** and **Next** move one sentence back or forward.
 - **Speed** changes the rate. The current sentence restarts at the new speed.
 - Once reading has started, clicking a sentence in the article reads from there.
@@ -25,10 +25,10 @@ All controls are buttons and a select, so they work from the keyboard. The playe
 
 ## What is read
 
-Text inside the target, in document order, one sentence at a time. These are skipped:
+Text inside the target, in document order, one sentence at a time. A sentence never runs on past the end of a paragraph or a `<br>`. These are skipped:
 
 - `nav`, `aside`, `pre`, `figure` (and its caption), `sup` (footnote markers), form controls, `svg` and `aria-hidden="true"` content.
-- Anything not rendered: `hidden`, `display: none` and similar.
+- Anything not rendered or invisible: `hidden`, `display: none`, `visibility: hidden` and similar.
 - Whatever matches `data-skip`.
 
 Inline `code` inside a sentence is read, since the sentence makes no sense without it.
@@ -41,4 +41,4 @@ Inline `code` inside a sentence is read, since the sentence makes no sense witho
 - **Sentences** are split with `Intl.Segmenter`. Where it is missing, each paragraph is read as one piece.
 - **Leaving the page** stops speech.
 - The player follows the page theme: `data-theme="light|dark"` on `<html>`, or the page's `color-scheme`.
-- Scrolling to the current sentence is instant when the visitor prefers reduced motion.
+- **Scrolling** keeps the current sentence in view by scrolling the window, instantly when the visitor prefers reduced motion. A target inside its own scrolling container is not scrolled.
