@@ -1,0 +1,252 @@
+:root {
+	color-scheme: light dark;
+	--bg: light-dark(#f6f6f3, #131416);
+	--surface: light-dark(#fff, #1c1e21);
+	--text: light-dark(#1d1f23, #e8e8e6);
+	--muted: light-dark(#5d626b, #a2a7b0);
+	--border: light-dark(#dcdcd6, #2f3237);
+	--accent: light-dark(#2f5fd0, #8fb0ff);
+	--code: light-dark(#f0f0ec, #111214);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	scroll-behavior: smooth;
+	scroll-padding-top: 16px;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font: 16px/1.5 system-ui, sans-serif;
+}
+
+a {
+	color: var(--accent);
+}
+
+.masthead {
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 40px 16px 8px;
+}
+
+.masthead h1 {
+	margin: 0;
+	font-size: 2.25rem;
+	letter-spacing: -0.02em;
+}
+
+.masthead p {
+	max-width: 60ch;
+	margin: 8px 0 0;
+	color: var(--muted);
+}
+
+.layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 24px;
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 16px;
+}
+
+nav ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+nav > ul {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 16px;
+}
+
+nav > ul > li > a {
+	font-weight: 600;
+}
+
+/* On narrow screens the list is a row of category links only. */
+nav ul ul {
+	display: none;
+}
+
+nav a {
+	text-decoration: none;
+}
+
+nav a:hover {
+	text-decoration: underline;
+}
+
+@media (min-width: 900px) {
+	.layout {
+		grid-template-columns: 220px minmax(0, 1fr);
+		gap: 40px;
+	}
+
+	nav {
+		position: sticky;
+		top: 16px;
+		align-self: start;
+		max-height: calc(100vh - 32px);
+		overflow: auto;
+	}
+
+	nav > ul {
+		display: block;
+	}
+
+	nav > ul > li {
+		margin-bottom: 16px;
+	}
+
+	nav ul ul {
+		display: block;
+		margin-top: 4px;
+		font-size: 0.9rem;
+	}
+
+	nav ul ul a {
+		display: block;
+		padding: 2px 0;
+		color: var(--muted);
+	}
+}
+
+section {
+	margin-bottom: 48px;
+}
+
+h2 {
+	margin: 0;
+	font-size: 1.5rem;
+}
+
+.lede {
+	margin: 4px 0 16px;
+	color: var(--muted);
+}
+
+.cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+	gap: 20px;
+}
+
+.card {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 0;
+	padding: 16px;
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	background: var(--surface);
+}
+
+.card:target {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+.card header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.card h3,
+.card p {
+	margin: 0;
+}
+
+.card h3 a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.size {
+	color: var(--muted);
+	font-size: 0.85rem;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.requires {
+	color: var(--muted);
+	font-size: 0.85rem;
+}
+
+iframe {
+	width: 100%;
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	background: #fff;
+	color-scheme: light;
+}
+
+pre {
+	margin: 0;
+	padding: 12px;
+	overflow-x: auto;
+	border-radius: 8px;
+	background: var(--code);
+	font: 0.8rem/1.5 ui-monospace, monospace;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+button {
+	padding: 6px 12px;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: var(--surface);
+	color: inherit;
+	font: inherit;
+	font-size: 0.9rem;
+	cursor: pointer;
+}
+
+button:hover {
+	border-color: var(--accent);
+}
+
+button:first-child {
+	border-color: var(--accent);
+	background: var(--accent);
+	color: var(--surface);
+}
+
+.links {
+	margin-left: auto;
+	color: var(--muted);
+	font-size: 0.85rem;
+}
+
+/* Announces copies to screen readers. The button label is the visible feedback. */
+.status {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+}

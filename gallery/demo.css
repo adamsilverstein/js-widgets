@@ -1,0 +1,21 @@
+/* Base styles for demo pages, so every demo looks like a plain, ordinary site. */
+:root {
+	color-scheme: light dark;
+}
+
+body {
+	max-width: 68ch;
+	margin: 0 auto;
+	padding: 16px;
+	font: 16px/1.6 system-ui, sans-serif;
+}
+
+h1,
+h2 {
+	line-height: 1.2;
+}
+
+.demo-note {
+	color: GrayText;
+	font-size: 0.9rem;
+}

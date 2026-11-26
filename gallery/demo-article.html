@@ -1,0 +1,18 @@
+<article lang="en">
+	<h1>A short history of the sidebar widget</h1>
+	<p>Long before anyone said "component", websites had widgets. A hit counter in the footer, a guestbook link, a clock that followed the mouse. They were small, a little silly, and you added one by pasting a few lines of code somebody else had written. That last part was the magic: you did not need to understand the code, only where to put it.</p>
+	<h2>The copy and paste years</h2>
+	<p>In the late 1990s, script archives collected hundreds of these snippets. A site owner would browse a category, try a demo, copy the source and paste it into their page. Nothing was installed and nothing was compiled. If the snippet broke, you deleted it. The cost of trying something was close to zero, which is why so many pages from that time had falling snow in December.</p>
+	<p>The snippets were not well made by modern standards. They wrote straight into the document, fought with each other over global variables, and assumed a mouse. But they taught a generation of people that a web page was something you could change yourself.</p>
+	<h2>Widgets move into the sidebar</h2>
+	<p>Blogging software turned the idea into a feature. WordPress shipped a widgets screen in 2007, where a calendar, a tag cloud or a list of recent comments could be dragged into a sidebar. The widget became a unit that themes and plugins could both speak about: a theme declared where widgets could go, and a plugin provided new ones.</p>
+	<p>This made widgets safer and more consistent, and also more tied to the system underneath. A tag cloud for one platform was no use on another. The snippet you could paste anywhere became a package you had to install somewhere.</p>
+	<h2>The embed takes over</h2>
+	<p>Then came the hosted embed. Video players, maps, comment threads and chat bubbles arrived as a script tag that loaded the real code from someone else's server. Embeds did far more than the old snippets ever could. They also brought trackers, cookies, hundreds of kilobytes of JavaScript and a monthly bill. Site owners stopped reading the code they pasted, because there was no longer any code to read.</p>
+	<h2>What the browser can do now</h2>
+	<p>The platform has quietly caught up. Shadow DOM keeps a widget's styles apart from the page. The Popover API and the dialog element handle focus and dismissal. Scroll-driven animations draw a progress bar with no JavaScript running. The Custom Highlight API paints search results without touching the document. Speech synthesis reads text aloud, and in some browsers a language model can summarize or translate it without the text ever leaving the device.</p>
+	<p>Each of these used to need a library or a service. Today a few hundred lines of plain JavaScript are often enough, and those lines can once again fit in a snippet you can read from top to bottom.</p>
+	<h2>Small on purpose</h2>
+	<p>A good widget is a guest in someone else's page. It should load fast, stay out of the way, respect the visitor's preferences for motion and color, and leave nothing behind when it is removed. It should work with a keyboard and a screen reader. Above all it should be small enough to understand, because the person pasting it is trusting it with their site.</p>
+	<p>That is the old promise, kept with new tools: find something you like, copy it, paste it, done.</p>
+</article>

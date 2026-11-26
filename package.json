@@ -1,0 +1,20 @@
+{
+  "name": "js-widgets",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone JavaScript widgets you can add to any site with one paste.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/dev.mjs",
+    "readme": "node scripts/build.mjs --readme",
+    "test": "node scripts/build.mjs && node test/run.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "playwright": "^1.65.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
