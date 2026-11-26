@@ -41,13 +41,14 @@ const CONDITIONS = [
  *
  * @param {number}  code WMO weather code.
  * @param {boolean} day  Whether the sun is up, to pick a sun or moon.
- * @return {{label: string, svg: string}} Condition.
+ * @return {{label: string, svg: Function}} The label, and a function that takes the
+ *         svg element's attributes and returns its markup.
  */
 function condition( code, day = true ) {
 	const [ , label, draw ] = CONDITIONS.find( ( [ codes ] ) => codes.includes( code ) ) ?? CONDITIONS[ 2 ];
 	return {
 		label,
-		svg: `<svg viewBox="0 0 32 32" aria-hidden="true">${ draw( day ) }</svg>`,
+		svg: ( attrs = 'aria-hidden="true"' ) => `<svg viewBox="0 0 32 32" ${ attrs }>${ draw( day ) }</svg>`,
 	};
 }
 
@@ -154,7 +155,12 @@ card.querySelector( 'h2' )?.append( config.label );
 const body = card.querySelector( 'div' );
 root.append( card );
 
-/** Shows a short status line, with an optional button below it. */
+/**
+ * Shows a short status line in place of the forecast.
+ *
+ * @param {string}      text     Message.
+ * @param {HTMLElement} [button] Button to show below it.
+ */
 function status( text, button ) {
 	body.innerHTML = '<p class="status"></p>';
 	body.firstChild.textContent = text;
@@ -171,15 +177,15 @@ function status( text, button ) {
 function render( { current, daily } ) {
 	const deg = ( value ) => `${ Math.round( value ) }°`;
 	const now = condition( current.weather_code, current.is_day );
+	// Dates arrive as `YYYY-MM-DD`, which parses as UTC midnight.
 	const weekday = new Intl.DateTimeFormat( undefined, { weekday: 'short', timeZone: 'UTC' } );
 	const days = [ 1, 2, 3 ].map( ( i ) => {
 		const day = condition( daily.weather_code[ i ] );
-		return `<li><span>${ weekday.format( new Date( daily.time[ i ] ) ) }</span>${ day.svg.replace(
-			'aria-hidden="true"',
+		return `<li><span>${ weekday.format( new Date( daily.time[ i ] ) ) }</span>${ day.svg(
 			`role="img" aria-label="${ day.label }"`
 		) }${ deg( daily.temperature_2m_max[ i ] ) } <span class="range">${ deg( daily.temperature_2m_min[ i ] ) }</span></li>`;
 	} );
-	body.innerHTML = `<div class="now">${ now.svg }<div>
+	body.innerHTML = `<div class="now">${ now.svg() }<div>
 <div class="temp">${ deg( current.temperature_2m ) }<small>${ units.toUpperCase() }</small></div>
 <div>${ now.label }</div>
 <div class="range">High ${ deg( daily.temperature_2m_max[ 0 ] ) } · Low ${ deg( daily.temperature_2m_min[ 0 ] ) }</div>
@@ -239,7 +245,7 @@ async function start() {
 				}
 			},
 			() => retry( 'Your location is not available.' ),
-			{ maximumAge: 30 * 60e3, timeout: 10000 }
+			{ maximumAge: CACHE_MINUTES * 60e3, timeout: 10000 }
 		);
 	} );
 	status( 'Show the weather where you are.', button );
