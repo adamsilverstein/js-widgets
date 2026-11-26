@@ -1,0 +1,17 @@
+<h1>Join the newsletter</h1>
+<form id="signup">
+	<label>Email <input type="email" name="email" value="you@example.com" required></label>
+	<button>Subscribe</button>
+</form>
+<p id="thanks" class="demo-note" role="status"></p>
+<p><button type="button" class="celebrate">Celebrate</button></p>
+<p class="demo-note">"Celebrate" fires from the button. "Subscribe" fires from the bottom of the page through the <code>jsw:confetti</code> event, once the (pretend) signup succeeds.</p>
+
+<script src="confetti.min.js" data-trigger=".celebrate"></script>
+<script>
+	document.getElementById( 'signup' ).addEventListener( 'submit', ( event ) => {
+		event.preventDefault();
+		document.getElementById( 'thanks' ).textContent = 'Thanks for subscribing!';
+		window.dispatchEvent( new CustomEvent( 'jsw:confetti' ) );
+	} );
+</script>
