@@ -1,0 +1,9 @@
+{
+	"name": "Tag Cloud Sphere",
+	"description": "Turns a list of tag links into a rotating 3D globe you can drag to spin, with every tag still a real link.",
+	"category": "fun",
+	"file": "sphere",
+	"issue": 9,
+	"snippet": "<script src=\"sphere.min.js\" data-target=\".wp-block-tag-cloud\" data-radius=\"140\"></script>",
+	"demoHeight": 400
+}
