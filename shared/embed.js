@@ -63,10 +63,15 @@ export function mountInline( css ) {
  * `ready()`, since it needs `<body>`.
  *
  * @param {string} css        Styles for the shadow root.
- * @param {string} [position] `top-left`, `top-right`, `bottom-left` or `bottom-right`.
+ * @param {string} [position] `top-left`, `top-right`, `bottom-left` or `bottom-right` (the default,
+ *                            also used for any other value).
  * @return {ShadowRoot} Root to render into.
  */
-export function mountCorner( css, position = 'bottom-right' ) {
+export function mountCorner( css, position ) {
+	// The value comes from a data- attribute, and an unknown one would leave the widget unplaced.
+	if ( ! /^(top|bottom)-(left|right)$/.test( position ) ) {
+		position = 'bottom-right';
+	}
 	const [ y, x ] = position.split( '-' );
 	let stack = document.querySelector( `[data-jsw-corner="${ position }"]` );
 	if ( ! stack ) {

@@ -49,7 +49,7 @@ The demo runs inside an iframe in the gallery, so a widget fixed to a corner sho
 These keep the widgets consistent, and settle the questions the first issues left open.
 
 - **One script tag, configured with `data-` attributes.** Read them with `options()` from `shared/embed.js`. The same tag works with a `src` or with the code inline.
-- **Shadow DOM for anything the widget renders**, so styles do not leak either way. `mountInline()` renders where the snippet was pasted, and `mountCorner()` renders a floating widget in a viewport corner. Widgets that share a corner stack instead of overlapping.
+- **Shadow DOM for anything the widget renders**, so styles do not leak either way. `mountInline()` renders where the snippet was pasted (so that snippet belongs in `<body>`, not `<head>`), and `mountCorner()` renders a floating widget in a viewport corner. Widgets that share a corner stack instead of overlapping.
 - **`data-target` is a CSS selector** for widgets that enhance markup already on the page. Wait for `ready()` before querying it. The page must keep working if the widget never loads.
 - **`data-position`** places a floating widget: `top-left`, `top-right`, `bottom-left` or `bottom-right`.
 - **Events are prefixed `jsw:`**, eg. `jsw:confetti`, and dispatched on or listened for on `window`.
