@@ -7,7 +7,8 @@ document.addEventListener( 'click', async ( event ) => {
 	if ( ! button ) {
 		return;
 	}
-	const label = button.textContent;
+	// Kept from the first click: by the second, the text may be "Copied".
+	const label = ( button.dataset.label ??= button.textContent );
 	let message = 'Copied';
 	try {
 		await navigator.clipboard.writeText( snippets[ button.dataset.widget ][ button.dataset.copy ] );
@@ -16,7 +17,8 @@ document.addEventListener( 'click', async ( event ) => {
 	}
 	button.textContent = message;
 	status.textContent = `${ message }: ${ label }`;
-	setTimeout( () => {
+	clearTimeout( button.resetTimer );
+	button.resetTimer = setTimeout( () => {
 		button.textContent = label;
 	}, 1500 );
 } );
