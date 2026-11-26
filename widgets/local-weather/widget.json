@@ -1,0 +1,9 @@
+{
+	"name": "Local Weather",
+	"description": "Current conditions and a three day forecast from Open-Meteo, with no API key.",
+	"category": "utility",
+	"file": "weather",
+	"issue": 2,
+	"snippet": "<script src=\"weather.min.js\" data-lat=\"44.05\" data-lon=\"-121.31\" data-units=\"f\" data-label=\"Bend, OR\"></script>",
+	"demoHeight": 600
+}
