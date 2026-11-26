@@ -9,6 +9,7 @@ Copy `widgets/_template` to `widgets/<your-slug>` and edit the files. The build 
 | `demo.html` | The live demo shown in the gallery. |
 | `README.md` | Options and notes for site owners. |
 | `*.test.mjs` | Optional behavior tests, run in headless Chromium. |
+| `poster.mjs` | Optional staging for the README screenshot, see Publishing. |
 | `assets/` | Optional files the demo needs (eg. a video). Copied next to the built demo page. |
 
 Run `npm run dev -- --template` to see the template itself in the gallery.
@@ -91,3 +92,20 @@ Do not assume a built-in AI API is missing in headless Chromium: recent builds e
 ## Publishing
 
 Merging to `main` runs the `Publish gallery` workflow. It builds the site, saves a screenshot of every demo (`npm run posters`), deploys both to GitHub Pages, and rewrites the widget list in the README. The README cannot run a demo, so it shows those screenshots, each linking to the live one. Do not edit that list by hand or in a pull request.
+
+### Screenshots
+
+Each screenshot is the demo at 440 by 275 pixels, a moment after it loads. A widget that looks like nothing until it is used (a button above an article, a panel that is closed) stages its own by adding `poster.mjs`:
+
+```js
+// Optional. Runs before the demo loads, eg. to mock a built-in AI API or a request.
+export async function setup( page ) {}
+
+// Runs once the demo has loaded. Leave the widget in the state worth showing.
+export default async function poster( page ) {
+	await page.getByRole( 'button', { name: 'TL;DR' } ).click();
+	await page.getByText( 'Summary' ).waitFor();
+}
+```
+
+`page` is a Playwright page. Run `npm run build && npm run posters` and look at `site/posters/<slug>.png`. If staging throws, the plain screenshot is used and the run prints a warning.
