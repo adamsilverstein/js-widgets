@@ -1,0 +1,10 @@
+{
+	"name": "Reading Progress",
+	"description": "A bar across the top of the page that fills as the reader moves through an article, with an estimate of the minutes left.",
+	"category": "reading",
+	"file": "progress",
+	"issue": 6,
+	"snippet": "<script src=\"progress.min.js\" data-target=\"article\" data-color=\"#f60\"></script>",
+	"maxBytes": 1536,
+	"demoHeight": 300
+}
