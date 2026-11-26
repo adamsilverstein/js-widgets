@@ -6,5 +6,6 @@
 	"issue": 12,
 	"snippet": "<script src=\"translate.min.js\" data-target=\"article\" data-languages=\"es,fr,de,ja\"></script>",
 	"demoHeight": 380,
-	"requires": "Chrome 138 or later on desktop"
+	"requires": "Chrome 138 or later on desktop",
+	"api": "Translator"
 }

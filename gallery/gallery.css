@@ -212,6 +212,24 @@ button small {
 	font-size: 0.95rem;
 }
 
+.unavailable {
+	display: grid;
+	gap: 12px;
+	max-width: 62ch;
+	padding: 14px;
+	border: 1.5px solid var(--ink);
+	border-radius: 12px;
+	font-size: 0.95rem;
+}
+
+.unavailable img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border: 1.5px solid var(--line);
+	border-radius: 8px;
+}
+
 /* The live demo. */
 
 .frame {

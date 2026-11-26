@@ -6,5 +6,6 @@
 	"issue": 11,
 	"snippet": "<script src=\"tldr.min.js\" data-target=\"article\" data-type=\"key-points\" data-length=\"short\"></script>",
 	"demoHeight": 440,
-	"requires": "Chrome 138 or later on desktop, with the built-in Summarizer model"
+	"requires": "Chrome 138 or later on desktop, with the built-in Summarizer model",
+	"api": "Summarizer"
 }

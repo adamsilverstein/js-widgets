@@ -88,6 +88,7 @@ function show( slug, focus ) {
 	<p class="description">${ escapeHtml( current.description ) }</p>
 	<p class="facts"><span><b>${ formatSize( current.bytes ) }</b> minified</span><span><b>${ formatSize( current.gzipBytes ) }</b> gzipped</span><span>No dependencies</span></p>
 	${ current.requires ? `<p class="requires">Needs ${ escapeHtml( current.requires ) }. In other browsers it stays out of the way.</p>` : '' }
+	${ current.api ? `<div class="unavailable" hidden><p></p><img src="posters/${ current.slug }.png" alt="${ escapeHtml( current.name ) } as it looks where it works" onerror="this.remove()"></div>` : '' }
 </header>
 <div class="frame">
 	<div class="bar">
@@ -119,10 +120,45 @@ ${ lines.join( '' ) }&gt;&lt;/script&gt;</code></pre>
 
 	stage.querySelector( '.frame' ).classList.toggle( 'phone', phone );
 	loadDemo();
+	explainIfUnavailable( current );
 	if ( focus ) {
 		scrollTo( 0, 0 );
 		stage.querySelector( 'h2' ).focus( { preventScroll: true } );
 	}
+}
+
+/**
+ * Tells the visitor when their browser cannot run a built-in AI widget. Such a
+ * widget renders nothing, so without this the demo just looks broken. A
+ * screenshot stands in for it.
+ *
+ * @param {Object} widget The widget just put on stage.
+ */
+async function explainIfUnavailable( widget ) {
+	const { api } = widget;
+	if ( ! api ) {
+		return;
+	}
+	let state = 'missing';
+	if ( api in self ) {
+		try {
+			state = await self[ api ].availability();
+		} catch {
+			// Some APIs need options to answer. That they exist is enough here.
+			state = 'available';
+		}
+	}
+	// The visitor may have moved on while availability() was pending.
+	const note = widget === current && stage.querySelector( '.unavailable' );
+	if ( ! note || ( state !== 'missing' && state !== 'unavailable' ) ) {
+		return;
+	}
+	note.querySelector( 'p' ).innerHTML = `<strong>Your browser cannot run this one.</strong> ${
+		state === 'missing'
+			? `It has no built-in ${ api } API.`
+			: `Chrome reports that its built-in ${ api } model is unavailable on this device.`
+	} The widget stays hidden in the demo below, as it would for your visitors. This is what it looks like where it works:`;
+	note.hidden = false;
 }
 
 /**
