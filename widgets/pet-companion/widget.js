@@ -138,12 +138,19 @@ ready( () => {
 		button.style.translate = `${ Math.max( 0, x - 8 ) }px 0`;
 	}
 
+	/**
+	 * Advances the pet one animation frame: picks a target, moves toward it and
+	 * poses. Stops the loop for reduced motion, a nap or a removed host.
+	 *
+	 * @param {DOMHighResTimeStamp} now Frame time from requestAnimationFrame.
+	 */
 	function tick( now ) {
 		if ( still.matches || ! host.isConnected ) {
 			running = false;
 			pose( 'sit' );
 			return;
 		}
+		// Capped so the pet does not jump after the tab was in the background.
 		const dt = Math.min( now - ( last || now ), 100 ) / 1000;
 		last = now;
 		const maxX = document.documentElement.clientWidth - WIDTH;
@@ -157,8 +164,7 @@ ready( () => {
 			speed = 0;
 			pose( 'sit' );
 		} else if ( now - lastActive > SLEEP_AFTER ) {
-			// Checked before `near`, so a pointer resting by the pet does not keep it awake.
-			// Nothing moves during a nap, so the loop stops until wake() restarts it.
+			// Ahead of `near`, so a pointer resting by the pet does not keep it awake.
 			running = false;
 			pose( 'sleep' );
 			return;
@@ -187,6 +193,7 @@ ready( () => {
 		requestAnimationFrame( tick );
 	}
 
+	/** Starts the animation loop, or sits the pet down when motion is reduced. */
 	function start() {
 		if ( still.matches ) {
 			pose( 'sit' );
@@ -197,12 +204,14 @@ ready( () => {
 		}
 	}
 
+	/** Records page activity, which postpones the next nap and ends the current one. */
 	function wake() {
 		lastActive = performance.now();
 		if ( state === 'sleep' ) {
 			start();
 		}
 	}
+
 	// Aborted when the visitor hides the pet, to remove the page-wide listeners.
 	const controller = new AbortController();
 	const { signal } = controller;
