@@ -11,15 +11,17 @@
  */
 import { createHost, options, ready, reducedMotion, script } from '../../shared/embed.js';
 
+const RAMP = ' .:-=+*#%@';
+
 const opts = options( {
 	cols: '100',
-	ramp: ' .:-=+*#%@',
+	ramp: RAMP,
 	color: '#33ff66',
 	autoplay: 'true',
 } );
 
 const columns = Math.max( 1, parseInt( opts.cols, 10 ) || 100 );
-const chars = [ ...opts.ramp ];
+const chars = [ ...( opts.ramp || RAMP ) ];
 
 // Monospace glyphs are about 0.6em wide and lines are 1em tall, so each character
 // cell covers a 0.6:1 patch of the picture.

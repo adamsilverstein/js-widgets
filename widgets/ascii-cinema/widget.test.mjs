@@ -154,3 +154,14 @@ test( 'enhances an existing video and keeps its captions', async () => {
 	assert.deepEqual( errors, [] );
 	await close();
 } );
+
+test( 'uses the default ramp and columns when the attributes are empty or invalid', async () => {
+	const { page, close } = await openDemo( 'ascii-cinema' );
+	await page.setContent( '<body><script src="../../ascii.min.js" data-src="clip.mp4" data-ramp="" data-cols="wide"></script></body>' );
+	await firstFrame( page );
+
+	const text = await page.getByRole( 'img' ).textContent();
+	assert.equal( text.split( '\n' )[ 0 ].length, 100 );
+	assert.ok( [ ...text.replaceAll( '\n', '' ) ].every( ( char ) => RAMP.includes( char ) ) );
+	await close();
+} );
