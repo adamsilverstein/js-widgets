@@ -244,6 +244,9 @@ function addBadges( images, onClick ) {
 	const observer = new ResizeObserver( place );
 	images.forEach( ( image ) => observer.observe( image ) );
 	observer.observe( document.body );
+	// Scroll events do not bubble, so capture them to follow images in
+	// scrolling containers such as carousels.
+	addEventListener( 'scroll', place, { capture: true, passive: true } );
 }
 
 /** Follows the page's `data-theme` when set, otherwise the system setting. */

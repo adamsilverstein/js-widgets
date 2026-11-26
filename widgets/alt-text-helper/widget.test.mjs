@@ -113,6 +113,26 @@ test( 'describes an offscreen lazy-loaded image', async () => {
 	await close();
 } );
 
+test( 'badges follow images in a scrolling container', async () => {
+	const { page, close } = await open( async ( page ) => {
+		await mockModel( page );
+		await addImages( page, '<div id="strip" style="height:100px;overflow:auto"><div style="height:300px"></div><img src="lighthouse.svg" width="100" height="60"></div>' );
+	} );
+	const badge = page.getByRole( 'button', { name: 'Image 4 has no alt text' } );
+	await badge.waitFor();
+	// Let the first ResizeObserver placement run before scrolling.
+	await page.evaluate( () => new Promise( requestAnimationFrame ) );
+	await page.evaluate( () => ( document.getElementById( 'strip' ).scrollTop = 250 ) );
+	// Scroll events fire at the next frame, before its animation callbacks.
+	await page.evaluate( () => new Promise( requestAnimationFrame ) );
+	const [ badgeTop, imageTop ] = await Promise.all( [
+		badge.evaluate( ( node ) => node.getBoundingClientRect().top ),
+		page.locator( '#strip img' ).evaluate( ( node ) => node.getBoundingClientRect().top ),
+	] );
+	assert.equal( Math.round( badgeTop - imageTop ), 4 );
+	await close();
+} );
+
 test( 'a badge moves keyboard focus to its entry', async () => {
 	const { page, close } = await open( mockModel );
 	await page.getByRole( 'button', { name: 'Image 2 has no alt text' } ).focus();
