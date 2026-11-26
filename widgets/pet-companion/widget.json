@@ -1,0 +1,9 @@
+{
+	"name": "Pet Companion",
+	"description": "A tiny pixel cat that wanders along the bottom of the page, chases the pointer, naps and purrs when clicked.",
+	"category": "fun",
+	"file": "pet",
+	"issue": 10,
+	"snippet": "<script src=\"pet.min.js\" data-pet=\"cat\"></script>",
+	"demoHeight": 240
+}
