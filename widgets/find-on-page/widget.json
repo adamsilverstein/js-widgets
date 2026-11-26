@@ -1,0 +1,9 @@
+{
+	"name": "Find on Page",
+	"description": "A floating search box that highlights every match in the page's content and steps through them, without rewriting the markup.",
+	"category": "reading",
+	"file": "find",
+	"issue": 14,
+	"snippet": "<script src=\"find.min.js\" data-target=\"main\" data-hotkey=\"/\"></script>",
+	"demoHeight": 360
+}
