@@ -5,5 +5,5 @@
 	"file": "synth",
 	"issue": 16,
 	"snippet": "<script src=\"synth.min.js\" data-octaves=\"2\" data-wave=\"sine\"></script>",
-	"demoHeight": 300
+	"demoHeight": 380
 }
