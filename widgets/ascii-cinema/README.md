@@ -6,6 +6,8 @@ Plays a video as live ASCII art. Good for a landing page, a 404 page or a demo r
 <script src="ascii.min.js" data-src="clip.mp4" data-cols="100" data-color="#33ff66"></script>
 ```
 
+Paste it in the `<body>` where the video should appear. With `data-target` the script can go anywhere, including `<head>`.
+
 To keep captions or other settings, put your own `<video>` on the page and point the widget at it. It stays a normal video if the widget never loads.
 
 ```html
