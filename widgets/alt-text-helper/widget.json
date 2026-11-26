@@ -6,5 +6,6 @@
 	"issue": 19,
 	"snippet": "<script src=\"alt.min.js\" data-param=\"alt-audit\"></script>",
 	"demoHeight": 480,
-	"requires": "Chrome 148 or later on desktop for suggestions"
+	"requires": "Chrome 148 or later on desktop for suggestions",
+	"poster": "?alt-audit"
 }
