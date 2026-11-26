@@ -20,6 +20,19 @@ test( 'draws a pet that is hidden from assistive technology, with a labelled hid
 	await close();
 } );
 
+test( 'shows the cat for any data-pet value', async () => {
+	const { page, errors, close } = await openDemo( 'pet-companion', {}, ( p ) =>
+		p.route( '**/demos/pet-companion/', async ( route ) => {
+			const body = ( await ( await route.fetch() ).text() ).replace( 'data-pet="cat"', 'data-pet="constructor"' );
+			await route.fulfill( { body, contentType: 'text/html' } );
+		} )
+	);
+	await page.waitForTimeout( 200 );
+	assert.deepEqual( errors, [] );
+	assert.equal( await page.locator( '.pet' ).count(), 1 );
+	await close();
+} );
+
 test( 'walks on its own', async () => {
 	const { page, close } = await openDemo( 'pet-companion' );
 	const before = await read( page );

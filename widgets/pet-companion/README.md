@@ -10,7 +10,7 @@ A tiny pixel cat that lives along the bottom edge of the window. It wanders and 
 
 | Attribute | Default | Description |
 | --- | --- | --- |
-| `data-pet` | `cat` | Which pet. Only `cat` ships so far. |
+| `data-pet` | `cat` | Reserved for more animals. Only the cat ships, and it shows whatever the value. |
 
 ## Notes
 

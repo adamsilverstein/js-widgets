@@ -3,15 +3,15 @@
  * It wanders and sits, chases the pointer when it comes close, naps when the
  * page has been still for a while, and shows a heart when clicked.
  *
- * Options (data- attributes on the script tag):
- *   data-pet  Which pet. Only "cat" for now.
+ * No options yet. `data-pet` is reserved for more animals, and any value shows
+ * the cat.
  */
-import { createHost, options, ready } from '../../shared/embed.js';
+import { createHost, ready } from '../../shared/embed.js';
 
 /** Pixel colors, keyed by the letters used in the frames below. */
 const PALETTE = { f: '#f0a040', d: '#a8611f', w: '#fff6e6', k: '#2a1d14', p: '#ef7f95' };
 
-/** Frames of a 16 by 10 pixel cat facing right. "." is transparent. */
+/** Head and body rows shared by the two walking frames. */
 const BODY = [
 	'..........f...f.',
 	'f.........fffff.',
@@ -22,7 +22,8 @@ const BODY = [
 	'..fffffffffffw..',
 	'..ffffffffffff..',
 ];
-const CAT = {
+/** Frames of a 16 by 10 pixel cat facing right. "." is transparent. */
+const frames = {
 	walk: [ ...BODY, '..f.f.....f.f...', '..w.w.....w.w...' ],
 	step: [ ...BODY, '...f.f...f.f....', '...w.w...w.w....' ],
 	sit: [
@@ -50,7 +51,6 @@ const CAT = {
 		'ffffffffffffww..',
 	],
 };
-const PETS = { cat: CAT };
 
 const SCALE = 3;
 const WIDTH = 16 * SCALE;
@@ -86,9 +86,6 @@ function isHidden() {
 		return false;
 	}
 }
-
-const { pet: kind } = options( { pet: 'cat' } );
-const frames = PETS[ kind ] || CAT;
 
 ready( () => {
 	if ( isHidden() ) {
