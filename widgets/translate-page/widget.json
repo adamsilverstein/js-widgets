@@ -7,5 +7,11 @@
 	"snippet": "<script src=\"translate.min.js\" data-target=\"article\" data-languages=\"es,fr,de,ja\"></script>",
 	"demoHeight": 380,
 	"requires": "Chrome 138 or later on desktop",
-	"api": "Translator"
+	"api": "Translator",
+	"apiOptions": [
+		{ "sourceLanguage": "en", "targetLanguage": "es" },
+		{ "sourceLanguage": "en", "targetLanguage": "fr" },
+		{ "sourceLanguage": "en", "targetLanguage": "de" },
+		{ "sourceLanguage": "en", "targetLanguage": "ja" }
+	]
 }

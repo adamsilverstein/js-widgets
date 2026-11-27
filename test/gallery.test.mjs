@@ -78,6 +78,7 @@ for ( const [ state, text ] of [
 		const note = page.locator( '.unavailable' );
 		await note.waitFor();
 		assert.ok( ( await note.textContent() ).includes( text ) );
+		assert.ok( ( await page.locator( '.status' ).textContent() ).includes( aiWidget.name ), 'announced' );
 		await close();
 	} );
 }
@@ -88,4 +89,36 @@ test( 'shows no note when the AI API can run', { skip: skipAi }, async () => {
 	await page.waitForTimeout( 300 );
 	assert.equal( await page.locator( '.unavailable' ).isHidden(), true );
 	await close();
+} );
+
+// An API that only answers for specific options, eg. a language pair.
+const optionsWidget = widgets.find( ( { apiOptions } ) => apiOptions );
+
+test( 'checks each set of options an API needs', { skip: optionsWidget ? false : 'no widget with apiOptions is built' }, async () => {
+	/** Mocks the class so that only the listed (stringified) options are usable. */
+	const mock = ( usable ) => ( page ) =>
+		page.addInitScript(
+			( [ api, list ] ) => {
+				self[ api ] = {
+					availability: async ( options ) => {
+						if ( ! options ) {
+							throw new TypeError( 'options required' );
+						}
+						return list.includes( JSON.stringify( options ) ) ? 'downloadable' : 'unavailable';
+					},
+				};
+			},
+			[ optionsWidget.api, usable ]
+		);
+
+	const none = await openPage( `#${ optionsWidget.slug }`, {}, mock( [] ) );
+	await none.page.locator( '.unavailable' ).waitFor();
+	await none.close();
+
+	const last = JSON.stringify( optionsWidget.apiOptions.at( -1 ) );
+	const one = await openPage( `#${ optionsWidget.slug }`, {}, mock( [ last ] ) );
+	await one.page.locator( 'iframe' ).waitFor();
+	await one.page.waitForTimeout( 300 );
+	assert.equal( await one.page.locator( '.unavailable' ).isHidden(), true );
+	await one.close();
 } );

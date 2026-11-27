@@ -129,36 +129,37 @@ ${ lines.join( '' ) }&gt;&lt;/script&gt;</code></pre>
 
 /**
  * Tells the visitor when their browser cannot run a built-in AI widget. Such a
- * widget renders nothing, so without this the demo just looks broken. A
- * screenshot stands in for it.
+ * widget shows little or nothing, so without this the demo just looks broken.
+ * A screenshot stands in for it.
  *
  * @param {Object} widget The widget just put on stage.
  */
 async function explainIfUnavailable( widget ) {
 	const { api } = widget;
-	if ( ! api ) {
+	// Captured now: by the time the check answers, the stage may have been rebuilt.
+	const note = stage.querySelector( '.unavailable' );
+	if ( ! api || ! note ) {
 		return;
 	}
 	let state = 'missing';
 	if ( api in self ) {
-		try {
-			state = await self[ api ].availability();
-		} catch {
-			// Some APIs need options to answer. That they exist is enough here.
-			state = 'available';
-		}
+		// One call per set of options the demo depends on. The widget works if any of them can run.
+		const states = await Promise.all(
+			( widget.apiOptions || [ undefined ] ).map( ( options ) => self[ api ].availability( options ).catch( () => 'unavailable' ) )
+		);
+		state = states.find( ( each ) => each !== 'unavailable' ) || 'unavailable';
 	}
-	// The visitor may have moved on while availability() was pending.
-	const note = widget === current && stage.querySelector( '.unavailable' );
-	if ( ! note || ( state !== 'missing' && state !== 'unavailable' ) ) {
+	if ( ! note.isConnected || ( state !== 'missing' && state !== 'unavailable' ) ) {
 		return;
 	}
-	note.querySelector( 'p' ).innerHTML = `<strong>Your browser cannot run this one.</strong> ${
+	const reason =
 		state === 'missing'
 			? `It has no built-in ${ api } API.`
-			: `Chrome reports that its built-in ${ api } model is unavailable on this device.`
-	} The widget stays hidden in the demo below, as it would for your visitors. This is what it looks like where it works:`;
+			: `Chrome reports that its built-in ${ api } model is unavailable on this device.`;
+	note.querySelector( 'p' ).innerHTML = `<strong>Your browser cannot run this one.</strong> ${ reason } The AI part is missing from the demo below, as it would be for visitors in a browser like yours. This is what it looks like where it works:`;
 	note.hidden = false;
+	// The note appears some time after the heading took focus, so it is announced too.
+	status.textContent = `Your browser cannot run ${ widget.name }. ${ reason }`;
 }
 
 /**
