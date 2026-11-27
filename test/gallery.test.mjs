@@ -52,3 +52,73 @@ test( 'copies the whole widget inline', { skip }, async () => {
 	assert.ok( ! copied.includes( ' src=' ) && copied.includes( code ) && copied.endsWith( '</script>' ) );
 	await close();
 } );
+
+// A widget built on an on-device AI API, which renders nothing where the API cannot run.
+const aiWidget = widgets.find( ( { api } ) => api );
+const skipAi = aiWidget ? false : 'no on-device AI widget is built';
+
+/** Replaces the widget's AI class with one reporting the given availability, or removes it. */
+const mockApi = ( state ) => ( page ) =>
+	page.addInitScript(
+		( [ api, value ] ) => {
+			delete self[ api ];
+			if ( value ) {
+				self[ api ] = { availability: async () => value };
+			}
+		},
+		[ aiWidget.api, state ]
+	);
+
+for ( const [ state, text ] of [
+	[ 'unavailable', 'unavailable on this device' ],
+	[ null, 'has no built-in' ],
+] ) {
+	test( `says why an AI demo is empty when the API is ${ state ?? 'missing' }`, { skip: skipAi }, async () => {
+		const { page, close } = await openPage( `#${ aiWidget.slug }`, {}, mockApi( state ) );
+		const note = page.locator( '.unavailable' );
+		await note.waitFor();
+		assert.ok( ( await note.textContent() ).includes( text ) );
+		assert.ok( ( await page.locator( '.status' ).textContent() ).includes( aiWidget.name ), 'announced' );
+		await close();
+	} );
+}
+
+test( 'shows no note when the AI API can run', { skip: skipAi }, async () => {
+	const { page, close } = await openPage( `#${ aiWidget.slug }`, {}, mockApi( 'downloadable' ) );
+	await page.locator( 'iframe' ).waitFor();
+	await page.waitForTimeout( 300 );
+	assert.equal( await page.locator( '.unavailable' ).isHidden(), true );
+	await close();
+} );
+
+// An API that only answers for specific options, eg. a language pair.
+const optionsWidget = widgets.find( ( { apiOptions } ) => apiOptions );
+
+test( 'checks each set of options an API needs', { skip: optionsWidget ? false : 'no widget with apiOptions is built' }, async () => {
+	/** Mocks the class so that only the listed (stringified) options are usable. */
+	const mock = ( usable ) => ( page ) =>
+		page.addInitScript(
+			( [ api, list ] ) => {
+				self[ api ] = {
+					availability: async ( options ) => {
+						if ( ! options ) {
+							throw new TypeError( 'options required' );
+						}
+						return list.includes( JSON.stringify( options ) ) ? 'downloadable' : 'unavailable';
+					},
+				};
+			},
+			[ optionsWidget.api, usable ]
+		);
+
+	const none = await openPage( `#${ optionsWidget.slug }`, {}, mock( [] ) );
+	await none.page.locator( '.unavailable' ).waitFor();
+	await none.close();
+
+	const last = JSON.stringify( optionsWidget.apiOptions.at( -1 ) );
+	const one = await openPage( `#${ optionsWidget.slug }`, {}, mock( [ last ] ) );
+	await one.page.locator( 'iframe' ).waitFor();
+	await one.page.waitForTimeout( 300 );
+	assert.equal( await one.page.locator( '.unavailable' ).isHidden(), true );
+	await one.close();
+} );

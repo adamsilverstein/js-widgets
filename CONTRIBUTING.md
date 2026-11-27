@@ -36,6 +36,8 @@ Run `npm run dev -- --template` to see the template itself in the gallery.
 - `maxBytes` (optional) fails the build when the minified file grows past it.
 - `demoHeight` (optional) is the height of the demo iframe in pixels. Default 280.
 - `requires` (optional) is shown above the demo for widgets that need a particular browser.
+- `api` (optional) names the built-in AI class an on-device AI widget needs, eg. `"api": "Summarizer"`. Where the visitor's browser lacks it or reports it unavailable, the gallery says so and shows the screenshot, since the demo itself stays empty.
+- `apiOptions` (optional) lists the options to pass to that class's `availability()`, for an API that needs them. The widget counts as usable if any entry is, eg. one `{ "sourceLanguage": "en", "targetLanguage": "es" }` per language the demo offers.
 - `poster` (optional) is a query string or fragment added to the demo URL for a widget that only shows itself with one, eg. `"poster": "?alt-audit"`. The gallery and the README screenshot both use it.
 
 ## demo.html

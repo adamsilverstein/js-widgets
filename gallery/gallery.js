@@ -88,6 +88,7 @@ function show( slug, focus ) {
 	<p class="description">${ escapeHtml( current.description ) }</p>
 	<p class="facts"><span><b>${ formatSize( current.bytes ) }</b> minified</span><span><b>${ formatSize( current.gzipBytes ) }</b> gzipped</span><span>No dependencies</span></p>
 	${ current.requires ? `<p class="requires">Needs ${ escapeHtml( current.requires ) }. In other browsers it stays out of the way.</p>` : '' }
+	${ current.api ? `<div class="unavailable" hidden><p></p><img src="posters/${ current.slug }.png" alt="${ escapeHtml( current.name ) } as it looks where it works" onerror="this.remove()"></div>` : '' }
 </header>
 <div class="frame">
 	<div class="bar">
@@ -119,10 +120,46 @@ ${ lines.join( '' ) }&gt;&lt;/script&gt;</code></pre>
 
 	stage.querySelector( '.frame' ).classList.toggle( 'phone', phone );
 	loadDemo();
+	explainIfUnavailable( current );
 	if ( focus ) {
 		scrollTo( 0, 0 );
 		stage.querySelector( 'h2' ).focus( { preventScroll: true } );
 	}
+}
+
+/**
+ * Tells the visitor when their browser cannot run a built-in AI widget. Such a
+ * widget shows little or nothing, so without this the demo just looks broken.
+ * A screenshot stands in for it.
+ *
+ * @param {Object} widget The widget just put on stage.
+ */
+async function explainIfUnavailable( widget ) {
+	const { api } = widget;
+	// Captured now: by the time the check answers, the stage may have been rebuilt.
+	const note = stage.querySelector( '.unavailable' );
+	if ( ! api || ! note ) {
+		return;
+	}
+	let state = 'missing';
+	if ( api in self ) {
+		// One call per set of options the demo depends on. The widget works if any of them can run.
+		const states = await Promise.all(
+			( widget.apiOptions || [ undefined ] ).map( ( options ) => self[ api ].availability( options ).catch( () => 'unavailable' ) )
+		);
+		state = states.find( ( each ) => each !== 'unavailable' ) || 'unavailable';
+	}
+	if ( ! note.isConnected || ( state !== 'missing' && state !== 'unavailable' ) ) {
+		return;
+	}
+	const reason =
+		state === 'missing'
+			? `It has no built-in ${ api } API.`
+			: `Chrome reports that its built-in ${ api } model is unavailable on this device.`;
+	note.querySelector( 'p' ).innerHTML = `<strong>Your browser cannot run the AI in this one.</strong> ${ reason } The AI part is missing from the demo below, as it would be for visitors in a browser like yours. This is what it looks like where it works:`;
+	note.hidden = false;
+	// The note appears some time after the heading took focus, so it is announced too.
+	status.textContent = `Your browser cannot run the AI in ${ widget.name }. ${ reason }`;
 }
 
 /**

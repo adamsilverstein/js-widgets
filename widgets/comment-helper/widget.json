@@ -6,5 +6,6 @@
 	"issue": 20,
 	"snippet": "<script src=\"write.min.js\" data-target=\"#comment, .contact-form textarea\"></script>",
 	"demoHeight": 480,
-	"requires": "Chrome 148 or later on desktop"
+	"requires": "Chrome 148 or later on desktop",
+	"api": "LanguageModel"
 }

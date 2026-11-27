@@ -6,5 +6,6 @@
 	"issue": 17,
 	"snippet": "<script src=\"ask.min.js\" data-target=\"main\" data-greeting=\"Ask me about this page\"></script>",
 	"demoHeight": 520,
-	"requires": "Chrome 148 or later on a desktop that can run Chrome's built-in AI"
+	"requires": "Chrome 148 or later on a desktop that can run Chrome's built-in AI",
+	"api": "LanguageModel"
 }

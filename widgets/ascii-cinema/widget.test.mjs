@@ -48,6 +48,8 @@ test( 'Pause stops conversion and Play resumes it', async () => {
 
 	await page.getByRole( 'button', { name: 'Pause' } ).click();
 	assert.equal( await page.evaluate( () => document.querySelector( 'video' ).paused ), true );
+	// A frame the video had already handed over when Pause was clicked may still be drawn.
+	await page.waitForTimeout( 200 );
 	assert.equal( await countFrames( page, 500 ), 0 );
 
 	await page.getByRole( 'button', { name: 'Play' } ).click();

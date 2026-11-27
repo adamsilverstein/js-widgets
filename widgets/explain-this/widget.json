@@ -6,5 +6,6 @@
 	"issue": 18,
 	"snippet": "<script src=\"explain.min.js\" data-target=\"article\" data-level=\"simple\"></script>",
 	"demoHeight": 420,
-	"requires": "Chrome 148 or later on desktop, with the built-in Prompt API"
+	"requires": "Chrome 148 or later on desktop, with the built-in Prompt API",
+	"api": "LanguageModel"
 }
